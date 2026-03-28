@@ -49,7 +49,7 @@ ECS AI Ops Chatbot is powered by:
 ├── config/
 │   ├── __init__.py
 │   ├── config.py             # Configuration file
-│   ├── settings.json.        # Generated automatically by the chatbot according to your dashboard settings
+│   ├── settings.json.        # Generated automatically by the chatbot according to ⚙️ Settings in the Chatbot UI
 │   ├── system_prompt.txt     # ECS AI Ops Chatbot system prompt
 │   └── kb_prompt.txt         # ECS KB Bot system prompt
 │
@@ -180,7 +180,7 @@ a. **Command-Line Arguments (CLI)**
    Values passed when starting the app (e.g., `--port`, `--host`, `--model-dir`, `--embed-dir`) override all other settings.
 
 b. **Settings File (`settings.json`)**  
-   Persistent overrides applied in `config/settings.json` are loaded next. Adjusting `MAX_NEW_TOKENS`, `LLM_TIMEOUT`, or `_KUBECTL_MAX_OUT` will create (if not exists), update this file.
+   Persistent overrides applied in `config/settings.json` are loaded next. `MAX_NEW_TOKENS`, `LLM_TIMEOUT`, or `_KUBECTL_MAX_OUT` will automatically be updated according to the :gear: Settings in the Chatbot UI.
 
 c. **Environment Variables `env`**  
    Variables like `KUBECONFIG_PATH`and `LOG_LEVEL` are loaded from environment if not overridden by CLI arguments.
