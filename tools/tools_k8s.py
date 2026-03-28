@@ -4954,38 +4954,52 @@ def get_namespace_resource_summary(namespace: str) -> str:
         pods = _core.list_namespaced_pod(namespace=namespace, limit=1000)
     except ApiException as e:
         return f"[ERROR] {_safe_reason(e)}"
+
     if not pods.items:
         return f"No pods found in namespace '{namespace}'."
+
     total_cpu_req = total_cpu_lim = 0
-    total_mem_req = total_mem_lim = 0.0
-    table_rows    = []
+    total_ram_req = total_ram_lim = 0.0
+    table_rows = []
+
     for pod in pods.items:
         cpu_req = cpu_lim = 0
-        mem_req = mem_lim = 0.0
-        for c in list(pod.spec.containers or []) + list(pod.spec.init_containers or []):
-            req = (c.resources.requests or {}) if c.resources else {}
-            lim = (c.resources.limits   or {}) if c.resources else {}
-            cpu_req += _parse_cpu_to_millicores(req.get("cpu",    "0"))
-            cpu_lim += _parse_cpu_to_millicores(lim.get("cpu",    "0"))
-            mem_req += _parse_mem_to_mib(req.get("memory", "0"))
-            mem_lim += _parse_mem_to_mib(lim.get("memory", "0"))
-        total_cpu_req += cpu_req; total_cpu_lim += cpu_lim
-        total_mem_req += mem_req; total_mem_lim += mem_lim
-        table_rows.append(f"| {pod.metadata.name} | {cpu_req or 0}m | {mem_req:.0f}Mi "
-                          f"| {cpu_lim or 0}m | {mem_lim:.0f}Mi |")
+        ram_req = ram_lim = 0.0
 
-    def _fmt_cpu(m): return "0m" if m == 0 else f"{m}m ({m/1000:.3f} cores)"
-    def _fmt_mem(mib): return "0Mi" if mib == 0 else f"{mib:.0f}Mi ({mib/1024:.2f}Gi)"
+        for c in pod.spec.containers or []:
+            req = (c.resources.requests or {}) if c.resources else {}
+            lim = (c.resources.limits or {}) if c.resources else {}
+
+            cpu_req += _parse_cpu_to_millicores(req.get("cpu", "0"))
+            cpu_lim += _parse_cpu_to_millicores(lim.get("cpu", "0"))
+            ram_req += _parse_mem_to_mib(req.get("memory", "0"))
+            ram_lim += _parse_mem_to_mib(lim.get("memory", "0"))
+
+        total_cpu_req += cpu_req
+        total_cpu_lim += cpu_lim
+        total_ram_req += ram_req
+        total_ram_lim += ram_lim
+
+        table_rows.append(
+            f"| {pod.metadata.name} | {cpu_req or 0}m | {ram_req:.0f}Mi "
+            f"| {cpu_lim or 0}m | {ram_lim:.0f}Mi |"
+        )
+
+    def _fmt_cpu(m):
+        return "0m" if m == 0 else f"{m}m ({m/1000:.3f} cores)"
+
+    def _fmt_ram(mib):
+        return "0Mi" if mib == 0 else f"{mib:.0f}Mi ({mib/1024:.2f}Gi)"
 
     return "\n".join([
-        f"## **Note**: CPU and RAM requested for pods include containers that have already terminated or completed.\n",
+        "## **Note**: Init containers are excluded from totals.\n",
         f"## Resource summary for namespace '{namespace}' ({len(pods.items)} pods)\n",
         f"- **Total CPU Requested**: {_fmt_cpu(total_cpu_req)}",
         f"- **Total CPU Limit**: {_fmt_cpu(total_cpu_lim)}",
-        f"- **Total MEMORY Requested**: {_fmt_mem(total_mem_req)}",
-        f"- **Total MEMORY Limit**: {_fmt_mem(total_mem_lim)}\n",
+        f"- **Total RAM Requested**: {_fmt_ram(total_ram_req)}",
+        f"- **Total RAM Limit**: {_fmt_ram(total_ram_lim)}\n",
         "**Per-pod breakdown:**\n",
-        "| POD NAME | CPU REQ | MEM REQ | CPU LIM | MEM LIM |",
+        "| POD | CPU REQ | RAM REQ | CPU LIM | RAM LIM |",
         "|---|---|---|---|---|",
     ] + table_rows)
 
