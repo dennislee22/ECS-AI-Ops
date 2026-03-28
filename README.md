@@ -151,7 +151,7 @@ ECS AI Ops Chatbot is powered by:
 git clone https://huggingface.co/Qwen/Qwen3-8B ~/models/Qwen3-8B
 ```
 
-##### Qwen3-8B-GGUF
+##### Qwen3-8B-GGUF (only on bare-metal server)
 ```bash
 git clone https://huggingface.co/Qwen/Qwen3-8B-GGUF ~/models/Qwen3-8B-GGUF
 ```
