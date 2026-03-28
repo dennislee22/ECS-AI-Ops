@@ -142,8 +142,9 @@ ECS AI Ops Chatbot is powered by:
 ## Quick Start
 
 - **Python 3.12** is required.
-- In an air-gapped environment, all Python libraries listed in `requirements.txt` must be pre-downloaded and hosted on an internal PyPI mirror or installed from local wheel files. Use `pip install -r requirements.txt`.
-- Download the LLM and embedding models before starting:
+- In an air-gapped environment, all Python libraries listed in `requirements.txt` must be pre-downloaded and hosted on an internal PyPI mirror or installed from local wheel files.
+
+#### 1. Download the LLM and embedding models before starting:
 
 ##### Qwen3-8B
 ```bash
@@ -160,7 +161,7 @@ git clone https://huggingface.co/Qwen/Qwen3-8B-GGUF ~/models/Qwen3-8B-GGUF
 git clone https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ~/models/nomic-embed-text-v1.5
 ```
 
-#### 1. Install dependencies
+#### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -171,7 +172,7 @@ For NVIDIA GPU:
 pip install torch --index-url https://download.pytorch.org/whl/cu121
 ```
 
-#### 2. Configure environment
+#### 3. Configure environment
 
 The ECS Knowledge Bot app reads configuration values in the following order of precedence:
 
@@ -207,7 +208,7 @@ LOG_LEVEL=warning
 | `GGUF_N_CTX` | Context window size (GGUF / CPU mode only) | 32768 |
 | `GGUF_N_THREADS` | CPU threads for GGUF inference | all cores |
 
-#### 3. Start the server
+#### 4. Start the engine!
 
 ```bash
 # Usage:
