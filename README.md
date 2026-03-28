@@ -217,7 +217,7 @@ python3 app.py --model-dir  ~/models/Qwen3-8B               # LLM from local dir
 python3 app.py --embed-dir  ~/models/nomic-embed-text-v1.5  # embeddings from local dir
 ```
 
-**Note:** You may also run this chatbot via `Application` in Cloudera AI using following the following script
+**Note:** You may also run this chatbot via `Application` in Cloudera AI using following the following Python script:
 
 ```python
 import os
