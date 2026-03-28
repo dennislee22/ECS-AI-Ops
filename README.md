@@ -289,7 +289,7 @@ The application automatically detects available GPUs at startup and uses them if
 
 ## Demo
 
-| CPU | GPU |
+| Inference using Nvidia GPU | Inference using CPU |
 |---|---|
-| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-cpu.gif" width="380" /> | <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gpu.gif" width="380" /> |
+| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gpu.gif" width="380" /> | <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-cpu.gif" width="380" /> |
 
