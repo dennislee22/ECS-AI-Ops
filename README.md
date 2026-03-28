@@ -182,10 +182,10 @@ a. **Command-Line Arguments (CLI)**
 b. **Settings File (`settings.json`)**  
    Persistent overrides applied in `config/settings.json` are loaded next. `MAX_NEW_TOKENS`, `LLM_TIMEOUT`, or `_KUBECTL_MAX_OUT` will automatically be updated according to the :gear: Settings in the Chatbot UI.
 
-c. **Environment Variables `env`**  
+c. **Environment Variables (`env`)**  
    Variables like `KUBECONFIG_PATH`and `LOG_LEVEL` are loaded from environment if not overridden by CLI arguments.
 
-d. **Defaults in `config/config.py`**  
+d. **Defaults in (`config/config.py`)**  
    If a value is not provided via CLI or environment, the app falls back to the default specified in `config.py`.
 
 > **Summary:**  
