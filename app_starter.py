@@ -12,12 +12,9 @@ QWEN_DIR = MODELS_DIR / "Qwen3-8B"
 EMBED_DIR = MODELS_DIR / "nomic-embed-text-v1.5"
 LOG_FILE = Path.home() / "cpu-qwen3-app.log"
 
-# Hugging Face repositories
+# Public Hugging Face repositories
 QWEN_REPO = "https://huggingface.co/Qwen/Qwen3-8B"
 EMBED_REPO = "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5"
-
-# Optional: Hugging Face token for private repos
-HF_TOKEN = os.environ.get("HF_TOKEN")  # Set HF_TOKEN in OpenShift secret/env if private
 
 # -----------------------------
 # Create models directory
@@ -25,23 +22,15 @@ HF_TOKEN = os.environ.get("HF_TOKEN")  # Set HF_TOKEN in OpenShift secret/env if
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------
-# Function to clone a repo if missing
+# Clone repos if missing
 # -----------------------------
 def clone_if_missing(repo_url, path):
-    if path.exists():
-        print(f"{path} already exists, skipping clone")
-        return
-
-    if HF_TOKEN:
-        # Insert token into URL for private repo
-        token_url = repo_url.replace("https://", f"https://{HF_TOKEN}@")
-        print(f"Cloning private repo {repo_url} into {path}")
-        subprocess.run(["git", "clone", token_url, str(path)], check=True)
-    else:
+    if not path.exists():
         print(f"Cloning {repo_url} into {path}")
         subprocess.run(["git", "clone", repo_url, str(path)], check=True)
+    else:
+        print(f"{path} already exists, skipping clone")
 
-# Clone the models
 clone_if_missing(QWEN_REPO, QWEN_DIR)
 clone_if_missing(EMBED_REPO, EMBED_DIR)
 
