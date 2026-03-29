@@ -660,13 +660,11 @@ def build_agent():
         else:
             import torch
 
-            # FIX: use semantic routing — pass only relevant tool schemas to
-            # apply_chat_template instead of all 50+.
-            # This is the primary fix for the 160 GB RAM spike:
-            # fewer tools = shorter input sequence = dramatically smaller attention tensor.
-            # Falls back to all tools automatically if confidence is low.
             _selected_schemas = retrieve_tools(_user_q, tool_schemas, top_k=8)
-            _log_ag.info(f"[REQ:{req_id}] [llm_node/hf] semantic routing → {len(_selected_schemas)}/{len(tool_schemas)} tools selected")
+           # _log_ag.info(f"[REQ:{req_id}] [llm_node/hf] semantic routing → {len(_selected_schemas)}/{len(tool_schemas)} tools selected")
+            _selected_names = [s["function"]["name"] for s in _selected_schemas]
+            _log_ag.info(f"[REQ:{req_id}] [llm_node/hf] semantic routing → {len(_selected_schemas)}/{len(tool_schemas)} tools selected: {', '.join(_selected_names)}")
+            # ------------------------
 
             kw = {"add_generation_prompt": True, "tools": _selected_schemas}
             if _is_qwen3:

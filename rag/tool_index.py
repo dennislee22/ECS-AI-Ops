@@ -18,7 +18,7 @@ _ALWAYS_INCLUDE = {
 
 _TABLE_NAME = "tool_index"
 _CONFIDENCE_THRESHOLD = 0.65
-_MIN_CONFIDENT = 3
+_MIN_CONFIDENT = 1
 
 # ── Embedding helper ─────────────────────────────────────────────────────────
 
