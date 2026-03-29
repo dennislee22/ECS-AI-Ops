@@ -592,8 +592,8 @@ def get_pod_status(namespace: str = "all", search: str | None = None,
 
         if not_running_mode and rows:
             lines.append(
-                f"\n_{len(rows)} non-running pod(s) found. "
-                "Ask for details on a specific pod to see logs and events._"
+                f"\n{len(rows)} non-running pod(s) found. "
+                "Ask for details on a specific pod to see logs and events."
             )
 
         return "\n".join(lines)
