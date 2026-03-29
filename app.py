@@ -479,6 +479,11 @@ def build_agent():
                 "Then add ONE final line summarizing the results. Count exactly how many nodes evaluated to YES above. Use this format:\n"
                 "Overall: <YES if count > 0, else NO> — <Exact count of YES nodes> node(s) have sufficient capacity."
             ),
+            "kubectl_exec": (
+                "Reproduce the command output VERBATIM. "
+                "Do NOT reformat, summarise, or omit any rows."
+            ),
+        }
 
         _ENUMERATION_TOOLS = { # Unique common prompt
              "get_pod_logs",
