@@ -18,7 +18,7 @@ _ALWAYS_INCLUDE = {
 
 _TABLE_NAME = "tool_index"
 _CONFIDENCE_THRESHOLD = 0.65
-_MIN_CONFIDENT = 3
+_MIN_CONFIDENT = 1
 
 # ── Embedding helper ─────────────────────────────────────────────────────────
 
@@ -47,11 +47,16 @@ def _get_embedder():
 
     return _embedder
 
-def _embed(text: str) -> list[float]:
+#def _embed(text: str) -> list[float]:
+#    embedder = _get_embedder()
+#    vec = embedder.encode(text, normalize_embeddings=True)
+#    return vec.tolist()
+def _embed(text: str, is_query: bool = False) -> list[float]:
     embedder = _get_embedder()
-    vec = embedder.encode(text, normalize_embeddings=True)
+    # Nomic expects 'search_query: ' for user questions
+    final_text = f"search_query: {text}" if is_query else text
+    vec = embedder.encode(final_text, normalize_embeddings=True)
     return vec.tolist()
-
 
 # ── Text to embed for each tool ───────────────────────────────────────────────
 
@@ -143,6 +148,7 @@ def retrieve_tools(
         # Retrieve top_k + buffer so we have room after filtering
         results = (
             table.search(query_vec)
+.                .metric("cosine")
                  .limit(top_k + len(_ALWAYS_INCLUDE))
                  .to_pandas()
         )
