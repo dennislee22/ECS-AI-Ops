@@ -39,7 +39,7 @@ _VERBATIM = (
 
 K8S_TOOL_METADATA: dict = {
 
-    "find_resource": {
+"find_resource": {
         "fn":               find_resource,
         "embed_keywords":   "find locate search where is running resource name pod deployment service ingress pvc configmap secret daemonset statefulset replicaset anywhere cluster",
         "description": (
@@ -55,9 +55,8 @@ K8S_TOOL_METADATA: dict = {
             "pass name_substring='' to show everything. "
             "Vague intent words like 'all', 'any', 'everything' are automatically treated as "
             "no filter, so the full resource list is returned. "
-            "The tool uses a two-stage fallback: if a typed search yields no matches it "
-            "automatically widens to all resource types and searches again, then falls back "
-            "to showing everything if still nothing is found. "
+            "The tool uses a safe fallback: if a typed search (e.g. pod) yields no matches, it "
+            "automatically widens to all resource types to see if it exists as something else. "
             "The fallback messages are user-facing — do NOT mention resource_type in your response. "
             "Do NOT use get_pod_status when a specific resource name is mentioned — use this tool. "
             "Do NOT use get_deployment, get_daemonset, get_statefulset when searching by name — use this tool. "
@@ -81,15 +80,12 @@ K8S_TOOL_METADATA: dict = {
                 "default":     None,
                 "description": (
                     "Optional resource type to restrict the search. Accepted values: "
-                    "'pod', 'deployment' or 'deploy', 'daemonset' or 'ds', "
-                    "'statefulset' or 'sts', 'replicaset' or 'rs', "
-                    "'svc' or 'service', 'ingress', 'pvc', 'configmap' or 'cm', 'secret'. "
-                    "Omit (None) to search all supported types at once. "
-                    "IMPORTANT: only set this if the user explicitly mentioned a resource type "
-                    "(e.g. 'find the grafana deployment', 'is there a grafana service'). "
-                    "If the user says 'find grafana', 'where is grafana', or any phrasing "
-                    "without a specific type, pass None — the tool searches all types automatically. "
-                    "Never infer a type from context."
+                    "'pod', 'deployment', 'daemonset', 'statefulset', 'replicaset', "
+                    "'svc' or 'service', 'ingress', 'pvc', 'configmap', 'secret'. "
+                    "CRITICAL INSTRUCTION: If the user explicitly includes a resource type in their question "
+                    "(e.g., 'where is grafana pod', 'find nginx deployment'), you MUST set this parameter to that type "
+                    "(e.g., 'pod', 'deployment'). Do NOT pass null if the user mentions a specific type! "
+                    "Only omit (None) if they do not mention a type at all (e.g., 'where is grafana')."
                 ),
             },
             "namespace":      _P_NS,

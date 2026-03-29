@@ -3265,8 +3265,12 @@ def find_resource(name_substring: str, resource_type: str = None, namespace: str
     try:
         _INTENT_WORDS = {"all", "any", "everything", "anything", "every", "show", "list"}
 
-        if name_substring and name_substring.strip().lower() in _INTENT_WORDS:
+        # Clean inputs safely
+        ns_clean = (name_substring or "").strip()
+        if ns_clean.lower() in _INTENT_WORDS:
             name_substring = ""
+        else:
+            name_substring = ns_clean
 
         if namespace and namespace.strip().lower() in ("all", "any", ""):
             namespace = None
@@ -3280,15 +3284,14 @@ def find_resource(name_substring: str, resource_type: str = None, namespace: str
             "configmap", "cm",
             "secret",
         }
+        
+        rt_original = resource_type
         if resource_type:
             rt = resource_type.strip().lower()
             resource_type = rt if rt in _VALID_TYPES else None
-        else:
-            resource_type = None
 
         def _build_resources(rt_filter):
             r = []
-
             def _status(desired, ready):
                 if desired == 0 and ready == 0: return "Scaled to 0"
                 return f"{ready}/{desired} ready" + (" ✅" if ready == desired else " ⚠️")
@@ -3296,101 +3299,87 @@ def find_resource(name_substring: str, resource_type: str = None, namespace: str
             if not rt_filter or rt_filter == "pod":
                 pods = (_core.list_namespaced_pod(namespace).items if namespace
                         else _core.list_pod_for_all_namespaces().items)
-                r.append(("Pod", pods,
-                           lambda p: f"{p.status.phase or 'Unknown'} on {p.spec.node_name or 'n/a'}"))
+                r.append(("Pod", pods, lambda p: f"{p.status.phase or 'Unknown'} on {p.spec.node_name or 'n/a'}"))
 
             if not rt_filter or rt_filter in ("deployment", "deploy"):
                 deps = (_apps.list_namespaced_deployment(namespace).items if namespace
                         else _apps.list_deployment_for_all_namespaces().items)
-                r.append(("Deployment", deps,
-                           lambda d, _s=_status: _s(d.spec.replicas or 0, d.status.ready_replicas or 0)))
+                r.append(("Deployment", deps, lambda d, _s=_status: _s(d.spec.replicas or 0, d.status.ready_replicas or 0)))
 
             if not rt_filter or rt_filter in ("daemonset", "ds"):
                 dss = (_apps.list_namespaced_daemon_set(namespace).items if namespace
                        else _apps.list_daemon_set_for_all_namespaces().items)
-                r.append(("DaemonSet", dss,
-                           lambda d, _s=_status: _s(d.status.desired_number_scheduled or 0,
-                                                     d.status.number_ready or 0)))
+                r.append(("DaemonSet", dss, lambda d, _s=_status: _s(d.status.desired_number_scheduled or 0, d.status.number_ready or 0)))
 
             if not rt_filter or rt_filter in ("statefulset", "sts"):
                 stss = (_apps.list_namespaced_stateful_set(namespace).items if namespace
                         else _apps.list_stateful_set_for_all_namespaces().items)
-                r.append(("StatefulSet", stss,
-                           lambda s, _s=_status: _s(s.spec.replicas or 0, s.status.ready_replicas or 0)))
+                r.append(("StatefulSet", stss, lambda s, _s=_status: _s(s.spec.replicas or 0, s.status.ready_replicas or 0)))
 
             if not rt_filter or rt_filter in ("replicaset", "rs"):
                 rss = (_apps.list_namespaced_replica_set(namespace).items if namespace
                        else _apps.list_replica_set_for_all_namespaces().items)
-                r.append(("ReplicaSet", rss,
-                           lambda rs, _s=_status: _s(rs.spec.replicas or 0, rs.status.ready_replicas or 0)))
+                r.append(("ReplicaSet", rss, lambda rs, _s=_status: _s(rs.spec.replicas or 0, rs.status.ready_replicas or 0)))
 
             if not rt_filter or rt_filter in ("svc", "service"):
                 svcs = (_core.list_namespaced_service(namespace).items if namespace
                         else _core.list_service_for_all_namespaces().items)
-                r.append(("Service", svcs,
-                           lambda svc: f"{svc.spec.type} {svc.spec.cluster_ip}"))
+                r.append(("Service", svcs, lambda svc: f"{svc.spec.type} {svc.spec.cluster_ip}"))
 
             if not rt_filter or rt_filter == "ingress":
                 ings = (_net.list_namespaced_ingress(namespace).items if namespace
                         else _net.list_ingress_for_all_namespaces().items)
-                r.append(("Ingress", ings,
-                           lambda ing: ", ".join(h.host for h in (ing.spec.rules or []) if h.host) or "-"))
+                r.append(("Ingress", ings, lambda ing: ", ".join(h.host for h in (ing.spec.rules or []) if h.host) or "-"))
 
             if not rt_filter or rt_filter == "pvc":
                 pvcs = (_core.list_namespaced_persistent_volume_claim(namespace).items if namespace
                         else _core.list_persistent_volume_claim_for_all_namespaces().items)
-                r.append(("PVC", pvcs,
-                           lambda pvc: (f"{pvc.status.phase or 'Unknown'} "
+                r.append(("PVC", pvcs, lambda pvc: (f"{pvc.status.phase or 'Unknown'} "
                                         f"{(pvc.spec.resources.requests or {}).get('storage', 'n/a') if pvc.spec.resources else 'n/a'}")))
 
             if not rt_filter or rt_filter in ("configmap", "cm"):
                 cms = (_core.list_namespaced_config_map(namespace).items if namespace
                        else _core.list_config_map_for_all_namespaces().items)
-                r.append(("ConfigMap", cms,
-                           lambda cm: f"{len(cm.data or {})} key(s)"))
+                r.append(("ConfigMap", cms, lambda cm: f"{len(cm.data or {})} key(s)"))
 
             if not rt_filter or rt_filter == "secret":
                 secs = (_core.list_namespaced_secret(namespace).items if namespace
                         else _core.list_secret_for_all_namespaces().items)
-                r.append(("Secret", secs,
-                           lambda sec: sec.type or "Opaque"))
+                r.append(("Secret", secs, lambda sec: sec.type or "Opaque"))
 
             return r
 
-        def _search(resources, force: bool = False) -> list[str]:
+        def _search(resources) -> list[str]:
             results = []
             for kind, items, details_fn in resources:
                 for item in items:
-                    if force or not name_substring or name_substring.lower() in item.metadata.name.lower():
+                    if not name_substring or name_substring.lower() in item.metadata.name.lower():
                         results.append(
                             f"| {kind} | {item.metadata.namespace or '-'} "
                             f"| {item.metadata.name} | {details_fn(item)} |"
                         )
             return results
 
+        # 1. Try search with requested type
         resources = _build_resources(resource_type)
         results   = _search(resources)
 
+        # 2. Smart Fallback: If they asked for a 'pod' but it doesn't exist, search all other types 
+        # so the LLM can say "No pod found, but I found a deployment"
         if not results and name_substring and resource_type:
             all_resources = _build_resources(None)
             results       = _search(all_resources)
             if results:
-                note = (f"Searched all resource types for `{name_substring}`:")
-                lines = [note,
+                lines = [f"Searched all resource types for `{name_substring}` (none found of type '{rt_original}'):",
                          "| Resource Type | Namespace | Name | Status/Details |",
                          "|---|---|---|---|"]
                 return "\n".join(lines + results)
 
+        # 3. Safe Exit: If literally nothing matches, just return text. No context nukes.
         if not results and name_substring:
-            all_resources = _build_resources(None)
-            results       = _search(all_resources, force=True)
-            fallback_note = (f"No resources found matching `{name_substring}`. "
-                             f"Showing all resources instead.")
-            lines = [fallback_note,
-                     "| Resource Type | Namespace | Name | Status/Details |",
-                     "|---|---|---|---|"]
-            return "\n".join(lines + results)
+            return f"No resources found matching `{name_substring}` in {namespace or 'all namespaces'}."
 
+        # 4. Standard Return
         scope       = f"namespace `{namespace}`" if namespace else "all namespaces"
         filter_note = f" matching `{name_substring}`" if name_substring else ""
         header      = f"Showing resources{filter_note} in {scope}."
@@ -3402,7 +3391,7 @@ def find_resource(name_substring: str, resource_type: str = None, namespace: str
     except Exception as e:
         return f"Unexpected error: {e}"
 
-_SYSTEM_NAMESPACES = ("kube-system", "coredns", "longhorn-system", "ingress-nginx")
+_SYSTEM_NAMESPACES = ("kube-system", "coredns", "longhorn-system")
 _MAX_DETAIL_ITEMS  = 5
 
 def _cap(items: list, max_n: int = _MAX_DETAIL_ITEMS) -> str:
