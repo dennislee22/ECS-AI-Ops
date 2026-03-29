@@ -16,21 +16,32 @@ LOG_FILE = Path.home() / "cpu-qwen3-app.log"
 QWEN_REPO = "https://huggingface.co/Qwen/Qwen3-8B"
 EMBED_REPO = "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5"
 
+# Optional: Hugging Face token for private repos
+HF_TOKEN = os.environ.get("HF_TOKEN")  # Set HF_TOKEN in OpenShift secret/env if private
+
 # -----------------------------
-# Ensure models directory exists
+# Create models directory
 # -----------------------------
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------
-# Clone Hugging Face models if missing
+# Function to clone a repo if missing
 # -----------------------------
 def clone_if_missing(repo_url, path):
-    if not path.exists():
+    if path.exists():
+        print(f"{path} already exists, skipping clone")
+        return
+
+    if HF_TOKEN:
+        # Insert token into URL for private repo
+        token_url = repo_url.replace("https://", f"https://{HF_TOKEN}@")
+        print(f"Cloning private repo {repo_url} into {path}")
+        subprocess.run(["git", "clone", token_url, str(path)], check=True)
+    else:
         print(f"Cloning {repo_url} into {path}")
         subprocess.run(["git", "clone", repo_url, str(path)], check=True)
-    else:
-        print(f"{path} already exists, skipping clone")
 
+# Clone the models
 clone_if_missing(QWEN_REPO, QWEN_DIR)
 clone_if_missing(EMBED_REPO, EMBED_DIR)
 
@@ -43,13 +54,13 @@ if requirements_file.exists():
     subprocess.run(["pip", "install", "--no-cache-dir", "-r", str(requirements_file)], check=True)
 
 # -----------------------------
-# Run the app
+# Start the app
 # -----------------------------
 print(f"Starting app on port {PORT}, logging to {LOG_FILE}")
 with open(LOG_FILE, "w") as f:
     subprocess.run([
         "python", str(APP_PATH),
-        "--host", "0.0.0.0",
+        "--host", "0.0.0.0",   # container-friendly
         "--port", PORT,
         "--model-dir", str(QWEN_DIR),
         "--embed-dir", str(EMBED_DIR)
