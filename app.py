@@ -622,7 +622,8 @@ def build_agent():
         _max_new = max(512, config.MAX_NEW_TOKENS) if has_tool_results else max(1024, config.MAX_NEW_TOKENS // 2)
 
         # ── Extract user query for semantic tool routing ──────────────────────
-        _user_q = next((m["content"] for m in chat_msgs if m["role"] == "user"), "")
+        #_user_q = next((m["content"] for m in chat_msgs if m["role"] == "user"), "")
+        _user_q = next((m.content for m in msgs if isinstance(m, HumanMessage)), "")
 
         if tokenizer is None:
             format_rules = (
