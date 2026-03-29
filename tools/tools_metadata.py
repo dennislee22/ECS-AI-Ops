@@ -466,7 +466,9 @@ K8S_TOOL_METADATA: dict = {
         "description": (
             "Get detailed info about a PersistentVolumeClaim (PVC), including status, storage class, bound volume, "
             "capacity, access modes, labels, annotations, and finalizers. Supports partial name search and namespace selection. "
-            "Use for: 'show me details of PVC X', 'which pod is using PVC X?', or 'what is the storage class and size of PVC X?'."
+            "Use for: 'show me details of PVC X', 'which pod is using PVC X?', or 'what is the storage class and size of PVC X?'. "
+            "CRITICAL GUARDRAIL: If the user explicitly asks to describe a 'Persistent Volume' or 'PV', DO NOT use this tool, "
+            "even if the name they provide starts with 'pvc-' (e.g., pvc-1234-5678). Use describe_pv instead."
         ),
         "parameters":  {
             "name":      {"type": "string", "description": "Name of the PVC to describe."},
@@ -483,7 +485,10 @@ K8S_TOOL_METADATA: dict = {
             "access modes, capacity, reclaim policy, volume source, node affinity, and events. "
             "Supports partial PV name search and optional full YAML output. "
             "Use for: 'what is the status of PV X', 'which PVC is bound to PV X', "
-            "or inspecting PV configuration and events."
+            "or inspecting PV configuration and events. "
+            "CRITICAL GUARDRAIL: Dynamically provisioned K8s PersistentVolumes often have names starting with 'pvc-' "
+            "(e.g., pvc-1234-5678). If the user asks about a 'Persistent Volume' or 'PV', you MUST use "
+            "this tool, regardless of whether the specific resource name contains the word 'pvc'."
         ),
         "parameters":  {
             "name":      {"type": "string",  "description": "Partial or full name of the PersistentVolume to describe."},
