@@ -1,8 +1,2 @@
 #!/bin/bash
-# This script is executed at container startup
-# It waits for app_starter.py to finish (clone + install deps) before starting app.py
-
-set -e  # exit on error
-
-echo "Starting ECS AI Ops via app_starter.py..."
-exec python ~/ECS-AI-Ops/app_starter.py
+exec python /opt/app-root/src/ECS-AI-Ops/app_starter.py
