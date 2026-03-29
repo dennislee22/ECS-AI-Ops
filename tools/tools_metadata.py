@@ -40,7 +40,8 @@ _VERBATIM = (
 K8S_TOOL_METADATA: dict = {
 
     "find_resource": {
-        "fn":          find_resource,
+        "fn":               find_resource,
+        "embed_keywords":   "find locate search where is running resource name pod deployment service ingress pvc configmap secret daemonset statefulset replicaset anywhere cluster",
         "description": (
             "Search for Kubernetes resources by name (partial, case-insensitive match) across "
             "all major resource types: pods, deployments, daemonsets, statefulsets, replicasets, "
@@ -93,7 +94,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_crds": {
-        "fn":          get_crds,
+        "fn":               get_crds,
+        "embed_keywords":   "crd custom resource definition customresourcedefinition list installed extensions api group",
         "description": (
             "List CustomResourceDefinitions (CRDs) installed in the cluster. "
             "Returns a Markdown table showing the CRD name, API group, scope (Namespaced/Cluster), and available versions. "
@@ -111,7 +113,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_longhorn_settings": {
-        "fn":          get_longhorn_settings,
+        "fn":               get_longhorn_settings,
+        "embed_keywords":   "longhorn settings config configuration backup enabled auto-cleanup snapshot",
         "description": (
             "Fetch and list Longhorn settings from the `longhorn-system` namespace. "
             "Returns a Markdown table showing the setting name and its current value. "
@@ -129,7 +132,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_longhorn_node_status": {
-        "fn":          get_longhorn_node_status,
+        "fn":               get_longhorn_node_status,
+        "embed_keywords":   "longhorn node status health disk pressure storage capacity overcommit warnings conditions schedulable replica missing packages dm_crypt",
         "description": (
             "Query the Longhorn nodes.longhorn.io CRD to report per-node storage health. "
             "Returns a summary table with: node ready/schedulable status, disk pressure flag, "
@@ -164,7 +168,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pods_on_node": {
-        "fn":          get_pods_on_node,
+        "fn":               get_pods_on_node,
+        "embed_keywords":   "pods on node hosted running schedule assigned placed specific server machine",
         "description": (
             "List all pods currently hosted on a specific Kubernetes node. "
             "Returns a Markdown table showing namespace, pod name, phase, and readiness. "
@@ -181,7 +186,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pods_using_resource": {
-        "fn":          get_pods_using_resource,
+        "fn":               get_pods_using_resource,
+        "embed_keywords":   "reverse lookup which pod uses attached mounted secret configmap pvc claim reference volume bound",
         "description": (
             "Reverse lookup: Find all pods that mount, claim, or reference a specific Secret, ConfigMap, or PVC. "
             "Use this tool when the user asks 'which pod uses secret X', 'what pods are associated with configmap Y', "
@@ -203,7 +209,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pod_containers_resources": {
-        "fn":          get_pod_containers_resources,
+        "fn":               get_pod_containers_resources,
+        "embed_keywords":   "pod containers resources requests limits cpu memory ram gpu image container name allocation",
         "description": (
             "List all containers in pods across a namespace (or all namespaces). "
             "Shows container name, image, CPU and memory requests/limits, and attached GPUs if any. "
@@ -219,7 +226,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pod_status": {
-        "fn":          get_pod_status,
+        "fn":               get_pod_status,
+        "embed_keywords":   "pod status list pods all running pending failed unknown crashloopbackoff imagepullbackoff oomkilled stuck broken unhealthy issues",
         "description": (
             "List Kubernetes pods with their phase, readiness, restart count, and conditions. "
             "This is the PRIMARY tool for listing pods and checking pod health. "
@@ -233,8 +241,6 @@ K8S_TOOL_METADATA: dict = {
             "Non-running results include an extra REASON column (e.g. CrashLoopBackOff, "
             "ImagePullBackOff, OOMKilled) so the cause is visible without a second tool call. "
             "Namespace defaults to 'all' unless the user explicitly specifies one. "
-            "Do NOT use this tool for detailed per-container resource requests or limits — "
-            "use get_pod_resource_requests for that purpose. "
             "Do NOT use get_unhealthy_pods_detail unless the user explicitly asks for logs "
             "or deep diagnostics on a specific pod."
         ),
@@ -259,7 +265,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pod_storage": {
-        "fn":          get_pod_storage,
+        "fn":               get_pod_storage,
+        "embed_keywords":   "pod storage pvc access mode rwo rwx readwriteonce readwritemany attached volume types class summary",
         "description": (
             "Show storage types (PVC access modes like ReadWriteOnce/ReadWriteMany) used by pods in a namespace. "
             "Supports searching by pod name or namespace — if no matches are found, falls back to all pods. "
@@ -275,7 +282,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pod_logs": {
-        "fn":          get_pod_logs,
+        "fn":               get_pod_logs,
+        "embed_keywords":   "pod logs log output stdout stderr tail lines crash error message trace",
         "description": (
             "Fetch recent log lines from pods. "
             "Supports filtering by pod name or namespace. "
@@ -293,7 +301,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "describe_pod": {
-        "fn":          describe_pod,
+        "fn":               describe_pod,
+        "embed_keywords":   "describe pod details restart count oomkilled error termination reason mounts volumes attached limits requests secret configmap pvc node assignment tolerations events yaml",
         "description": (
             "Get complete details about a specific pod including: container states, restart counts, "
             "last termination reason (OOMKilled, Error, etc.), CPU/memory requests and limits, "
@@ -333,7 +342,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_node_info": {
-        "fn":          get_node_info,
+        "fn":               get_node_info,
+        "embed_keywords":   "node info status health ready notready cordoned schedulingdisabled unschedulable resources cpu ram gpu capacity roles machine server",
         "description": (
             "Check Kubernetes node health, resources, and scheduling status. "
             "Returns a Markdown table with columns: NODE, ROLES, STATUS (including Ready/NotReady and Cordon/SchedulingDisabled), CPU, RAM (Gi), GPU. "
@@ -362,7 +372,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_gpu_info": {
-        "fn":          get_gpu_info,
+        "fn":               get_gpu_info,
+        "embed_keywords":   "gpu hardware nvidia vram gram capacity allocatable attached pods in use specifications graphics card",
         "description": (
             "List nodes with GPU hardware and their technical specifications. "
             "Returns a Markdown table showing GPU product name, total count, memory per card (GRAM/VRAM), "
@@ -376,7 +387,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_node_labels": {
-        "fn":          get_node_labels,
+        "fn":               get_node_labels,
+        "embed_keywords":   "node labels tags selector key value annotations",
         "description": (
             "Show labels for Kubernetes nodes in the cluster. "
             "Returns a structured Markdown list mapping nodes to their labels. "
@@ -392,7 +404,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_node_taints": {
-        "fn":          get_node_taints,
+        "fn":               get_node_taints,
+        "embed_keywords":   "node taints noschedule noexecute tainted repels pods toleration effect key value",
         "description": (
             "List taints on all Kubernetes nodes. "
             "Returns the taint key, value, and effect for each node. "
@@ -433,7 +446,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "describe_sc": {
-        "fn":          describe_sc,
+        "fn":               describe_sc,
+        "embed_keywords":   "describe storageclass sc provisioner volume binding mode reclaim policy default storage details configuration",
         "description": (
             "Get detailed info about a Kubernetes StorageClass, including provisioner, parameters, "
             "volume binding mode, and reclaim policy. Supports partial name search if needed. "
@@ -447,7 +461,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "describe_pvc": {
-        "fn":          describe_pvc,
+        "fn":               describe_pvc,
+        "embed_keywords":   "describe pvc persistentvolumeclaim status bound capacity access modes storage class labels annotations yaml",
         "description": (
             "Get detailed info about a PersistentVolumeClaim (PVC), including status, storage class, bound volume, "
             "capacity, access modes, labels, annotations, and finalizers. Supports partial name search and namespace selection. "
@@ -461,7 +476,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "describe_pv": {
-        "fn":          describe_pv,
+        "fn":               describe_pv,
+        "embed_keywords":   "describe pv persistentvolume status capacity reclaim policy volume source hostpath affinity node nfs",
         "description": (
             "Get detailed info about a PersistentVolume (PV): status, storage class, "
             "access modes, capacity, reclaim policy, volume source, node affinity, and events. "
@@ -476,7 +492,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_events": {
-        "fn":          get_events,
+        "fn":               get_events,
+        "embed_keywords":   "events warning normal errors issues cluster history log timeline what happened",
         "description": (
             "Fetch recent Kubernetes events. Use for diagnosing issues, errors, or warnings. "
             "Supports searching by namespace, involved object, or message content (partial matches). "
@@ -492,7 +509,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_deployment": {
-        "fn":          get_deployment,
+        "fn":               get_deployment,
+        "embed_keywords":   "deployment health replicas ready available desired rollout list status apps",
         "description": (
             "List Deployments and their health status (desired, ready, available pods). "
             "Supports filtering by partial name match. " + _VERBATIM
@@ -504,25 +522,29 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_statefulset": {
-        "fn":          get_statefulset,
+        "fn":               get_statefulset,
+        "embed_keywords":   "statefulset sts health replicas ready desired list status database apps",
         "description": "List StatefulSets and their health status (desired vs ready pods). " + _VERBATIM,
         "parameters":  {"namespace": _P_NS},
     },
 
     "get_daemonset": {
-        "fn":          get_daemonset,
+        "fn":               get_daemonset,
+        "embed_keywords":   "daemonset ds health replicas ready available list status node agents",
         "description": "List DaemonSets and their health status (desired, ready, available pods). " + _VERBATIM,
         "parameters":  {"namespace": _P_NS},
     },
 
     "get_replicaset": {
-        "fn":          get_replicaset,
+        "fn":               get_replicaset,
+        "embed_keywords":   "replicaset rs health replicas ready list status old versions",
         "description": "List ReplicaSets and their health status (desired, ready, available pods). " + _VERBATIM,
         "parameters":  {"namespace": _P_NS},
     },
 
     "get_pdb_status": {
-        "fn":          get_pdb_status,
+        "fn":               get_pdb_status,
+        "embed_keywords":   "pdb poddisruptionbudget disruption budget minimum available maximum unavailable evictions upgrades blocked drain node safe",
         "description": (
             "List all PodDisruptionBudgets (PDBs) across a namespace (or all namespaces). "
             "Shows minimum available, maximum unavailable, allowed disruptions, and current/desired healthy counts. "
@@ -533,7 +555,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_webhook_health": {
-        "fn":          get_webhook_health,
+        "fn":               get_webhook_health,
+        "embed_keywords":   "webhook admission mutating validating failurepolicy fail break cluster configuration mutator validator",
         "description": (
             "List all Mutating and Validating Admission Webhook Configurations in the cluster. "
             "Shows webhook name, target service/URL, and explicitly flags webhooks with 'failurePolicy: Fail'. "
@@ -543,7 +566,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_cronjob_status": {
-        "fn":          get_cronjob_status,
+        "fn":               get_cronjob_status,
+        "embed_keywords":   "cronjob schedule suspended active jobs last run nightly batch scheduled task",
         "description": (
             "List all CronJobs across a namespace (or all namespaces). "
             "Shows the schedule, whether it is suspended, the number of currently active jobs, and the time since the last run. "
@@ -557,7 +581,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_network_policy_status": {
-        "fn":          get_network_policy_status,
+        "fn":               get_network_policy_status,
+        "embed_keywords":   "networkpolicy network policy netpol ingress egress security lateral movement open namespaces traffic rules firewall",
         "description": (
             "Audit NetworkPolicies across a namespace (or all namespaces). "
             "Shows the policy name, pod selector, and policy types (Ingress/Egress). "
@@ -568,7 +593,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_control_plane_status": {
-        "fn":          get_control_plane_status,
+        "fn":               get_control_plane_status,
+        "embed_keywords":   "control plane health etcd kube-apiserver api controller-manager scheduler metrics db size leader raft index revision system master",
         "description": (
             "Check the health of core Kubernetes control plane components (etcd, kube-apiserver, kube-controller-manager, kube-scheduler). "
             "Reads ComponentStatuses and inspects core pods running in the kube-system namespace. "
@@ -582,7 +608,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_certificate_status": {
-        "fn":          get_certificate_status,
+        "fn":               get_certificate_status,
+        "embed_keywords":   "certificate cert-manager tls expiration expired notafter secret ready validity https",
         "description": (
             "List cert-manager Certificates across a namespace (or all namespaces). "
             "Shows the Certificate's Ready status, target secret name, and exact expiration date (notAfter). "
@@ -593,7 +620,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_adhoc_job_status": {
-        "fn":          get_adhoc_job_status,
+        "fn":               get_adhoc_job_status,
+        "embed_keywords":   "job adhoc standalone failed succeeded active batch execution task run",
         "description": (
             "List standalone or ad-hoc Jobs across a namespace (or all namespaces). "
             "By default, this excludes Jobs spawned by CronJobs to prevent log spam. "
@@ -611,7 +639,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_hpa_status": {
-        "fn":          get_hpa_status,
+        "fn":               get_hpa_status,
+        "embed_keywords":   "hpa horizontalpodautoscaler autoscaling min max replicas maxed out scaled target resource scale metrics",
         "description": (
             "Check HorizontalPodAutoscaler (HPA) status across a namespace (or all namespaces). "
             "Shows current, desired, min, and max replica counts and flags any HPAs pinned at max replicas. "
@@ -621,7 +650,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pvc_status": {
-        "fn":          get_pvc_status,
+        "fn":               get_pvc_status,
+        "embed_keywords":   "pvc persistentvolumeclaim status bound access modes storage class capacity volume list",
         "description": (
             "Show the status of PersistentVolumeClaims (PVCs) in a namespace. "
             "Provides a Markdown table listing PVCs with details: phase, access modes, storage class, capacity, and volume. "
@@ -637,7 +667,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_cluster_version": {
-        "fn":          get_cluster_version,
+        "fn":               get_cluster_version,
+        "embed_keywords":   "cluster version kubernetes k8s server client api control plane versioning upgrade",
         "description": (
             "Show the Kubernetes cluster version. "
             "Returns both server (API server) and client versions. "
@@ -649,7 +680,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_storage_classes": {
-        "fn":          get_storage_classes,
+        "fn":               get_storage_classes,
+        "embed_keywords":   "storageclass sc provisioner default storage persistent list types drivers",
         "description": (
             "List all StorageClasses in the cluster. "
             "Shows provisioner type and whether each class is default. "
@@ -661,7 +693,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_endpoints": {
-        "fn":          get_endpoints,
+        "fn":               get_endpoints,
+        "embed_keywords":   "endpoints ep pod ips port traffic backing service network addresses discovery",
         "description": (
             "List Kubernetes Endpoints — the actual pod IP:port addresses backing each Service. "
             "Use this when the user wants to know WHICH POD IPs are receiving traffic, not just which services exist. "
@@ -682,7 +715,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_node_capacity": {
-        "fn":          get_node_capacity,
+        "fn":               get_node_capacity,
+        "embed_keywords":   "node capacity allocatable requested remaining cpu memory ram gpu available maximum cluster resources total size",
         "description": (
             "Show the CPU, memory, and GPU allocatable capacity of each Kubernetes node, "
             "and how much CPU/memory has been requested by pods, with the remaining available. "
@@ -694,7 +728,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_persistent_volumes": {
-        "fn":          get_persistent_volumes,
+        "fn":               get_persistent_volumes,
+        "embed_keywords":   "pv persistentvolume phase capacity reclaim policy bound claim storage class volumes persistent global",
         "description": (
             "List all PersistentVolumes with phase, capacity, reclaim policy, storage class, "
             "and bound claim (namespace/PVC name). Use for PV-level questions: reclaim policy, "
@@ -705,7 +740,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_service": {
-        "fn":          get_service,
+        "fn":               get_service,
+        "embed_keywords":   "service svc network port expose selector headless clusterip loadbalancer nodeport list services",
         "description": (
             "List Kubernetes Services (svc) and highlight those with no pod selector (potential misconfigs). "
             "Use cases: "
@@ -724,7 +760,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_ingress": {
-        "fn":          get_ingress,
+        "fn":               get_ingress,
+        "embed_keywords":   "ingress rules hostname fqdn url port 443 80 load balancer https tls domain web traffic route",
         "description": (
             "List Ingress rules, hostnames, ports, and load balancer IPs/addresses. "
             "Can find which ingress and namespace serve a specific hostname (FQDN) or port. "
@@ -759,7 +796,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_ingress_traffic": {
-        "fn":          get_ingress_traffic,
+        "fn":               get_ingress_traffic,
+        "embed_keywords":   "ingress traffic network receive transmit bandwidth graph chart prometheus nginx data transfer bytes",
         "description": (
             "Show ingress nginx network traffic (receive and transmit) over a time period, "
             "with graph output. Queries CDP Prometheus in the cdp namespace. "
@@ -780,7 +818,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_configmap_list": {
-        "fn":          get_configmap_list,
+        "fn":               get_configmap_list,
+        "embed_keywords":   "configmap cm list configuration drift credentials keys variables environments data list maps",
         "description": (
             "List ConfigMaps in a namespace — useful for checking configuration drift. "
             "Supports searching by ConfigMap name or namespace. "
@@ -799,7 +838,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_secret_list": {
-        "fn":          get_secret_list,
+        "fn":               get_secret_list,
+        "embed_keywords":   "secret list keys decode values passwords credentials certificates tls cert ca token auth encoded secret key",
         "description": (
             "Fetch secret KEY NAMES or decoded VALUES from a namespace or a specific secret. "
             "Use `filter_keys=['username','password','user','pass']` to find credential keys, "
@@ -833,7 +873,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_resource_quotas": {
-        "fn":          get_resource_quotas,
+        "fn":               get_resource_quotas,
+        "embed_keywords":   "resourcequota quota usage hard limit cpu memory pods namespace limits capacity restrictions allocation budget",
         "description": (
             "Check Kubernetes ResourceQuotas and current usage per namespace. "
             "Supports searching by quota name or namespace using partial matches. "
@@ -850,7 +891,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_limit_ranges": {
-        "fn":          get_limit_ranges,
+        "fn":               get_limit_ranges,
+        "embed_keywords":   "limitrange limits constraints min max default cpu memory namespace resource bounds boundary restrictions",
         "description": (
             "List Kubernetes LimitRanges that enforce CPU and memory constraints per namespace. "
             "Supports searching by LimitRange name or namespace using partial matches. "
@@ -866,7 +908,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_serviceaccounts": {
-        "fn":          get_serviceaccounts,
+        "fn":               get_serviceaccounts,
+        "embed_keywords":   "serviceaccount sa roles clusterroles rbac bindings identity token permissions access service account",
         "description": (
             "List Kubernetes ServiceAccounts across namespaces with their attached Roles and ClusterRoles. "
             "Supports searching by ServiceAccount name or namespace using partial matches. "
@@ -882,13 +925,15 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_cluster_role_bindings": {
-        "fn":          get_cluster_role_bindings,
+        "fn":               get_cluster_role_bindings,
+        "embed_keywords":   "clusterrolebinding crb clusterrole rbac permissions audit security roles identity wide cluster access",
         "description": "List ClusterRoleBindings — useful for auditing broad RBAC permissions.",
         "parameters":  {},
     },
 
     "get_namespace_status": {
-        "fn":          get_namespace_status,
+        "fn":               get_namespace_status,
+        "embed_keywords":   "namespace ns status total pods count list summary healthy unhealthy phase groupings breakdown",
         "description": (
             "List all namespaces with their status and pod counts. "
             "Provides totals of pods in Running, Pending, Failed, Unknown, and Unhealthy states. "
@@ -920,7 +965,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pod_tolerations": {
-        "fn":          get_pod_tolerations,
+        "fn":               get_pod_tolerations,
+        "embed_keywords":   "pod tolerations tolerate taints noschedule noexecute key operator value effect bypass schedules scheduling allow",
         "description": (
             "Show Kubernetes pod tolerations used for scheduling onto tainted nodes. "
             "Returns a Markdown table with combined toleration details (key, operator, value, effect) in a single column. "
@@ -936,28 +982,9 @@ K8S_TOOL_METADATA: dict = {
         },
     },
 
-#    "get_pod_resource_requests": {
-#        "fn":          get_pod_resource_requests,
-#        "description": (
-#            "Show detailed CPU and memory RESOURCE REQUESTS and LIMITS for containers across pods. "
-#            "Returns a Markdown table with per-container and per-pod resource requests and limits. "
-#            "Also shows which containers request GPU resources. "
-#            "Supports filtering pods by name or namespace using the 'search' parameter. "
-#            "If no search matches, the table falls back to listing all pods. "
-#            "This is scheduling allocation data from pod.spec.resources, NOT real-time usage. "
-#            "Use for questions like: 'cpu request for pod X', 'memory limit for pod Y', "
-#            "'resources requested by pods', 'which pods request GPU', or 'per-pod resource breakdown'. "
-#            "Do NOT use for totals, sums, or calculations across a namespace — use get_namespace_resource_summary instead. "
-#            "Do NOT use for runtime health/status — use get_pod_status instead."
-#        ),
-#        "parameters":  {
-#            "namespace": _P_NS,
-#            "search":    {**_P_SEARCH, "description": "Optional string to filter pods or namespaces (partial match)."},
-#        },
-#    },
-
     "run_cluster_health": {
-        "fn":          run_cluster_health,
+        "fn":               run_cluster_health,
+        "embed_keywords":   "cluster health check scorecard status overall ok failing issues warning general fast overview summary",
         "description": (
             "Run a quick scorecard-style health check of the entire Kubernetes cluster. "
             "Covers nodes, system pods, workloads, storage, networking, and recent warning events. "
@@ -975,7 +1002,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_namespace_resource_summary": {
-        "fn":          get_namespace_resource_summary,
+        "fn":               get_namespace_resource_summary,
+        "embed_keywords":   "namespace resource summary aggregate total sum cpu memory requests limits allocation usage aggregate",
         "description": (
             "Calculate and aggregate TOTAL CPU and memory RESOURCE REQUESTS and LIMITS across ALL pods in a namespace. "
             "Returns the TOTAL (sum) CPU and memory requests/limits first, followed by a per-pod breakdown. "
@@ -983,14 +1011,14 @@ K8S_TOOL_METADATA: dict = {
             "Use for: 'calculate total cpu requested in namespace', 'sum of memory requests in namespace', "
             "'total resources in namespace', 'how much CPU or RAM is requested in namespace X', "
             "'aggregate resource usage for namespace', 'overall resource allocation'. "
-            "Do NOT use for a single pod or detailed container-level breakdown — use get_pod_resource_requests instead. "
             "Do NOT use for real-time utilization — use get_top_pods or get_top_nodes instead."
         ),
         "parameters":  {"namespace": _P_NS},
     },
 
     "get_pod_images": {
-        "fn":          get_pod_images,
+        "fn":               get_pod_images,
+        "embed_keywords":   "pod images containers version registry repo repository tag sha256 digest deployed software version release",
         "description": (
             "List the container image and version for every pod in a namespace (or cluster-wide). "
             "Returns the full image reference (registry/repo:tag) from pod spec, plus the resolved "
@@ -998,7 +1026,7 @@ K8S_TOOL_METADATA: dict = {
             "Use for: image versions, what version is running, which tag is deployed, image digests, "
             "comparing image versions across pods or namespaces. "
             "Do NOT use for pod health, status, or errors — use get_unhealthy_pods_detail for that. "
-            "OUTPUT FORMAT: present results as one bullet per pod showing the image — NOT health fields. "
+            "OUTPUT FORMAT: present results as one bullet per pod showing the image — NOT healthীব fields. "
             "Format: '- `namespace/pod-name` [container]: registry/image:tag'. "
             "NEVER show 'Running | Restarts | Cause' for image queries — those fields do not apply here."
         ),
@@ -1006,7 +1034,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_unhealthy_pods_detail": {
-        "fn":          get_unhealthy_pods_detail,
+        "fn":               get_unhealthy_pods_detail,
+        "embed_keywords":   "unhealthy pods failing crashloopbackoff oomkilled pending restarts errors logs diagnose troubleshoot stuck broken issue problem reason exit code",
         "description": (
             "The primary tool for ALL pod health questions. "
             "Lists every pod's phase, readiness, restart count, container state, exit codes, "
@@ -1033,7 +1062,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_coredns_health": {
-        "fn":          get_coredns_health,
+        "fn":               get_coredns_health,
+        "embed_keywords":   "coredns dns health resolution nslookup service discovery pod name resolve internet lookup domain ip",
         "description": (
             "Check CoreDNS health and DNS resolution in the cluster. "
             "Reports CoreDNS pod phase/readiness/restarts and runs a live nslookup test against "
@@ -1049,7 +1079,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_pv_usage": {
-        "fn":          get_pv_usage,
+        "fn":               get_pv_usage,
+        "embed_keywords":   "pv pvc disk usage storage capacity full df percent running out limit bounds free space consumed gb",
         "description": (
             "Check actual disk usage of all bound PersistentVolumeClaims by exec-ing df "
             "into the pod that has each PVC mounted. "
@@ -1075,7 +1106,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "exec_db_query": {
-        "fn":          exec_db_query,
+        "fn":               exec_db_query,
+        "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace information data queries",
         "description": (
             "Execute a read-only SQL query inside a running database pod in a Kubernetes namespace. "
             "Supports MySQL, MariaDB, and PostgreSQL, auto-detected from the container image or name. "
@@ -1130,7 +1162,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_top_pods": {
-        "fn":          get_top_pods,
+        "fn":               get_top_pods,
+        "embed_keywords":   "top pods metrics cpu memory ram usage usage graph highest lowest live historical data trend performance",
         "description": (
             "Show live or historical CPU and memory usage for pods, ranked highest or lowest. "
             "ALWAYS emits both a ranked table AND a time-series graph in the output. "
@@ -1201,7 +1234,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "get_top_nodes": {
-        "fn":          get_top_nodes,
+        "fn":               get_top_nodes,
+        "embed_keywords":   "top nodes metrics cpu memory ram disk io read write throughput usage graph highest lowest live historical data trend performance",
         "description": (
             "Show live or historical CPU and memory usage for nodes, ranked highest or lowest. "
             "ALWAYS emits both a ranked table AND a time-series graph in the output. "
@@ -1263,7 +1297,8 @@ K8S_TOOL_METADATA: dict = {
     },
 
     "kubectl_exec": {
-        "fn":          kubectl_exec,
+        "fn":               kubectl_exec,
+        "embed_keywords":   "kubectl exec command fallback rollout top api-resources get yaml describe custom script shell api",
         "description": (
             "Fallback tool for kubectl queries not covered by any dedicated tool. "
             "Use ONLY when no specific tool exists for the query. "

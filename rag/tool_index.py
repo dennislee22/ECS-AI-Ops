@@ -18,7 +18,7 @@ _ALWAYS_INCLUDE = {
 
 _TABLE_NAME = "tool_index"
 _CONFIDENCE_THRESHOLD = 0.65
-_MIN_CONFIDENT = 1
+_MIN_CONFIDENT = 1  # <-- FIXED: Allow even a single highly confident match to succeed
 
 # ── Embedding helper ─────────────────────────────────────────────────────────
 
@@ -47,25 +47,25 @@ def _get_embedder():
 
     return _embedder
 
-#def _embed(text: str) -> list[float]:
-#    embedder = _get_embedder()
-#    vec = embedder.encode(text, normalize_embeddings=True)
-#    return vec.tolist()
 def _embed(text: str, is_query: bool = False) -> list[float]:
     embedder = _get_embedder()
-    # Nomic expects 'search_query: ' for user questions
+    # <-- FIXED: Nomic-embed-text strictly expects a task prefix for user questions
     final_text = f"search_query: {text}" if is_query else text
     vec = embedder.encode(final_text, normalize_embeddings=True)
     return vec.tolist()
+
 
 # ── Text to embed for each tool ───────────────────────────────────────────────
 
 def _tool_text(name: str, cfg: dict) -> str:
     """
     Build the text that gets embedded for a tool.
-    We embed name + first 300 chars of description only.
-    Parameters are excluded — they add noise without helping semantic match.
+    Prioritizes 'embed_keywords' if present for pure semantic signal.
     """
+    # <-- FIXED: Decouple retrieval (keywords) from execution (instructions)
+    if "embed_keywords" in cfg:
+        return f"{name}: {cfg['embed_keywords']}"
+        
     desc = cfg.get("description", "")
     # First 300 chars captures the intent; verbose guardrails are not needed
     # for retrieval — they're needed at execution time (full schema).
@@ -101,7 +101,7 @@ def ingest_tools(all_tools: dict[str, dict]) -> None:
         rows = []
         for name, cfg in all_tools.items():
             text = _tool_text(name, cfg)
-            vector = _embed(text)
+            vector = _embed(text, is_query=False)
             rows.append({
                 "tool_name": name,
                 "text":      text,
@@ -121,7 +121,7 @@ def ingest_tools(all_tools: dict[str, dict]) -> None:
 def retrieve_tools(
     user_query: str,
     all_schemas: list[dict],
-    top_k: int = 8,
+    top_k: int = 8,  # You can safely bump this up to 12 in app.py if needed!
 ) -> list[dict]:
     # Build a quick lookup: tool_name → full schema
     schema_map = {s["function"]["name"]: s for s in all_schemas}
@@ -143,12 +143,12 @@ def retrieve_tools(
 
         table = db.open_table(_TABLE_NAME)
 
-        query_vec = _embed(user_query)
+        query_vec = _embed(user_query, is_query=True)
 
         # Retrieve top_k + buffer so we have room after filtering
         results = (
             table.search(query_vec)
-                 .metric("cosine")
+                 .metric("cosine")  # <-- FIXED: Tell LanceDB to use Cosine distance
                  .limit(top_k + len(_ALWAYS_INCLUDE))
                  .to_pandas()
         )
