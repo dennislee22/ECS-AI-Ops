@@ -288,7 +288,11 @@ The application automatically detects available GPUs at startup and uses them if
 
 ## Demo
 
-| Inference using Nvidia GPU (Qwen3-8B) | Inference using CPU (Qwen3-8B-GGUF) |
-|---|---|
-| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gpu.gif" width="580" /> | <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gguf.gif" width="580" /> |
+| Inference using Nvidia GPU (Qwen3-8B) |
+|---|
+| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gpu.gif" width="700" /> |
+
+| Inference using CPU (Qwen3-8B-GGUF) |
+|---|
+| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gguf.gif" width="700" /> |
 
