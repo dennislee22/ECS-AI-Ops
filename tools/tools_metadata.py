@@ -61,6 +61,9 @@ K8S_TOOL_METADATA: dict = {
             "The fallback messages are user-facing — do NOT mention resource_type in your response. "
             "Do NOT use get_pod_status when a specific resource name is mentioned — use this tool. "
             "Do NOT use get_deployment, get_daemonset, get_statefulset when searching by name — use this tool. "
+            "CRITICAL GUARDRAIL: Do NOT use this tool to search for abstract capabilities, traits, or configurations "
+            "(e.g., 'autoscaling', 'storage', 'gpu'). ONLY use this tool when the user provides the actual proper noun "
+            "name of an application (e.g., 'grafana', 'vault'). If the user asks 'which pod has autoscaling', use get_hpa_status instead. "
             "Returns: scope header, resource type, namespace, name, and status/details per row."
         ),
         "parameters":  {
@@ -649,7 +652,9 @@ K8S_TOOL_METADATA: dict = {
         "description": (
             "Check HorizontalPodAutoscaler (HPA) status across a namespace (or all namespaces). "
             "Shows current, desired, min, and max replica counts and flags any HPAs pinned at max replicas. "
-            "Use for queries like: 'check autoscaling', 'are any HPAs maxed out', 'show HPA status in namespace X'."
+            "Use for queries like: 'check autoscaling', 'are any HPAs maxed out', 'show HPA status in namespace X', "
+            "or 'which pods have autoscaling capability / auto-scale'. "
+            "Since HPAs explicitly target deployments and pods, this is the exact tool to use to find what is autoscaling."
         ),
         "parameters":  {"namespace": _P_NS},
     },
