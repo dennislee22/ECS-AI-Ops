@@ -19,7 +19,6 @@ EMBED_REPO = "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5"
 # -----------------------------
 # Ensure working directory
 # -----------------------------
-# Make sure the app runs relative to ECS-AI-Ops repo
 os.chdir(str(Path.home() / "ECS-AI-Ops"))
 
 # -----------------------------
@@ -28,12 +27,16 @@ os.chdir(str(Path.home() / "ECS-AI-Ops"))
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------
-# Clone repos if missing
+# Clone repos if missing (wait for completion)
 # -----------------------------
 def clone_if_missing(repo_url, path):
     if not path.exists():
         print(f"Cloning {repo_url} into {path}")
+        # subprocess.run waits for clone to complete
         subprocess.run(["git", "clone", repo_url, str(path)], check=True)
+        # Verify clone finished
+        if not path.exists():
+            raise RuntimeError(f"Failed to clone {repo_url} into {path}")
     else:
         print(f"{path} already exists, skipping clone")
 
