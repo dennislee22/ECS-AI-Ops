@@ -4983,7 +4983,7 @@ def get_namespace_resource_summary(namespace: str = "all") -> str:
     try:
         from kubernetes.client.rest import ApiException
         
-        # 1. FIX: Handle the "all" namespace properly
+        # 1. Handle the "all" namespace properly
         is_all = namespace.lower() in ("all", "any", "")
         if is_all:
             pods_res = _core.list_pod_for_all_namespaces(limit=1000)
@@ -5009,35 +5009,18 @@ def get_namespace_resource_summary(namespace: str = "all") -> str:
         pod_ns = pod.metadata.namespace
         pod_name = pod.metadata.name
         
-        # 2. FIX: Sum standard application containers
-        app_cpu_req = app_cpu_lim = 0
-        app_ram_req = app_ram_lim = 0.0
+        # 2. Sum ONLY the standard application containers
+        pod_cpu_req = pod_cpu_lim = 0
+        pod_ram_req = pod_ram_lim = 0.0
+        
         for c in pod.spec.containers or []:
             req = (c.resources.requests or {}) if c.resources else {}
             lim = (c.resources.limits or {}) if c.resources else {}
 
-            app_cpu_req += _parse_cpu_to_millicores(req.get("cpu", "0"))
-            app_cpu_lim += _parse_cpu_to_millicores(lim.get("cpu", "0"))
-            app_ram_req += _parse_mem_to_mib(req.get("memory", "0"))
-            app_ram_lim += _parse_mem_to_mib(lim.get("memory", "0"))
-
-        # 3. FIX: Find the maximum requested by any single init container
-        init_cpu_req = init_cpu_lim = 0
-        init_ram_req = init_ram_lim = 0.0
-        for c in pod.spec.init_containers or []:
-            req = (c.resources.requests or {}) if c.resources else {}
-            lim = (c.resources.limits or {}) if c.resources else {}
-            
-            init_cpu_req = max(init_cpu_req, _parse_cpu_to_millicores(req.get("cpu", "0")))
-            init_cpu_lim = max(init_cpu_lim, _parse_cpu_to_millicores(lim.get("cpu", "0")))
-            init_ram_req = max(init_ram_req, _parse_mem_to_mib(req.get("memory", "0")))
-            init_ram_lim = max(init_ram_lim, _parse_mem_to_mib(lim.get("memory", "0")))
-
-        # 4. FIX: Effective Pod Resources = max(init_max, app_sum)
-        pod_cpu_req = max(app_cpu_req, init_cpu_req)
-        pod_ram_req = max(app_ram_req, init_ram_req)
-        pod_cpu_lim = max(app_cpu_lim, init_cpu_lim)
-        pod_ram_lim = max(app_ram_lim, init_ram_lim)
+            pod_cpu_req += _parse_cpu_to_millicores(req.get("cpu", "0"))
+            pod_cpu_lim += _parse_cpu_to_millicores(lim.get("cpu", "0"))
+            pod_ram_req += _parse_mem_to_mib(req.get("memory", "0"))
+            pod_ram_lim += _parse_mem_to_mib(lim.get("memory", "0"))
 
         total_cpu_req += pod_cpu_req
         total_cpu_lim += pod_cpu_lim
@@ -5063,8 +5046,7 @@ def get_namespace_resource_summary(namespace: str = "all") -> str:
         return "0Mi" if mib == 0 else f"{mib:.0f}Mi ({mib/1024:.2f}Gi)"
 
     header = [
-        f"## Resource summary for {ns_label} ({len(pods)} pods)",
-        f"*(Calculated using K8s native scheduling math: `max(max(init_containers), sum(app_containers))`)*\n",
+        f"## Resource summary for {ns_label} ({len(pods)} pods)\n",
         f"- **Total CPU Requested**: {_fmt_cpu(total_cpu_req)}",
         f"- **Total CPU Limit**: {_fmt_cpu(total_cpu_lim)}",
         f"- **Total RAM Requested**: {_fmt_ram(total_ram_req)}",
