@@ -462,7 +462,7 @@ def build_agent():
             "get_node_capacity": (
                 "The table above is the complete and final node capacity data. Do NOT call any tool.\n\n"
                 "CRITICAL INSTRUCTION: First, check if the user's question explicitly contains SPECIFIC NUMBERS for a resource request (e.g., '2 vCPU', '8GB', '500m').\n\n"
-                "SCENARIO A - NO SPECIFIC NUMBERS PROVIDED (e.g., 'how much capacity is available', 'what resources are requested', 'show capacity'):\n"
+                "SCENARIO A - NO SPECIFIC NUMBERS PROVIDED:\n"
                 "Reproduce the table output VERBATIM with a brief one-line intro. "
                 "Do NOT evaluate nodes. Do NOT perform a fit-check. Do NOT add an 'Overall' line. Stop here.\n\n"
                 "SCENARIO B - SPECIFIC NUMBERS PROVIDED (e.g., 'can I fit a pod with 4 cores', 'schedule a pod requesting 8GB'):\n"
@@ -473,10 +473,11 @@ def build_agent():
                 "Memory values in the table are in GiB. 8GB ≈ 8 GiB, 1256GB = 1256 GiB.\n"
                 "Evaluate each node strictly using this format:\n"
                 "- Node: <node_name>\n"
-                "  CPU: <Table CPU AVAIL> >= <User's Requested CPU> -> <TRUE/FALSE>\n"
-                "  RAM: <Table RAM AVAIL> >= <User's Requested RAM> -> <TRUE/FALSE>\n"
-                "  Available on node?: <YES/NO>\n\n"
-                "Overall: [YES/NO] — [N] node(s) have sufficient capacity."
+                "  CPU: <Table CPU AVAIL> >= <User's Requested CPU> -> <TRUE or FALSE>\n"
+                "  RAM: <Table RAM AVAIL> >= <User's Requested RAM> -> <TRUE or FALSE>\n"
+                "  Available on node?: <YES if BOTH CPU and RAM are TRUE, otherwise NO>\n\n"
+                "Then add ONE final line summarizing the results. Count exactly how many nodes evaluated to YES above. Use this format:\n"
+                "Overall: <YES if count > 0, else NO> — <Exact count of YES nodes> node(s) have sufficient capacity."
             ),
             "kubectl_exec": (
                 "Reproduce the command output VERBATIM. "
