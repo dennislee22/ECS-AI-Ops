@@ -990,7 +990,7 @@ button{cursor:pointer;font-family:inherit}
         <!-- ── ECS AI Ops Chatbot ──────────────────────────────────────── -->
         <h2 style="font-size:15px;font-family:'IBM Plex Sans',sans-serif;letter-spacing:normal"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" style="vertical-align:-2px;margin-right:5px"><use href="#icon-chat"/></svg> ECS AI Ops Chatbot</h2>
         <p>Each query runs through an <strong>agentic ReAct loop</strong> driven by the LLM. The agent selects from a suite of Kubernetes tools covering pod status, node inspection, events, logs, PVC bindings, Longhorn storage, resource metrics, Secrets, deployments, services, ingress, ReplicaSets, and direct database access. It observes the results and decides whether to chain further tool calls or synthesise a final answer. Each query is treated independently with no conversation history.</p>
-        <div class="tip">💡 Query "Which pods are hosted in ecs-m-01.dlee155.cldr.example?" and “List all pods hosted in ecs-m-01.dlee155.cldr.example” are interpreted differently. The latter returns results faster because the chatbot is designed to skip synthesis and directly display the full tool output when it sees “List all,” saving both time and tokens.</div>
+        <div class="tip">💡 Querying “Which pods are hosted in ecs-m-01.dlee155.cldr.example?” and “List all pods hosted in ecs-m-01.dlee155.cldr.example” yields different interpretations. The latter returns results faster because the chatbot is designed to skip synthesis and directly display the full tool output when it detects “List all,” saving both time and tokens.</div>
 
         <!-- Skip Synthesis -->
         <h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;">Skip Synthesis
