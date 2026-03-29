@@ -4027,7 +4027,7 @@ def generate_healthcheck_report() -> str:
 
 
     # ── 3. Resource Capacity ──────────────────────────────────────────────
-R.append(section("3. Resource Capacity"))
+    R.append(section("3. Resource Capacity"))
     try:
         all_ns = [ns.metadata.name for ns in _core.list_namespace().items]
         ns_data = []
