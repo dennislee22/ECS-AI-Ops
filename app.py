@@ -472,13 +472,11 @@ def build_agent():
                 "800CPU = 800 cores, 2 vCPU = 2 cores, 500m = 0.5 cores. "
                 "Memory values in the table are in GiB. 8GB ≈ 8 GiB, 1256GB = 1256 GiB.\n"
                 "Evaluate each node strictly using this format:\n"
-                "Node: [Name]\n"
-                "CPU: [Avail] >= [Req] -> [TRUE/FALSE]\n"
-                "RAM: [Avail] >= [Req] -> [TRUE/FALSE]\n"
-                "Available on node?: [YES/NO]\n"
-                "Conclusion: [one sentence]\n\n"
-                "Then add ONE final line:\n"
-                "Overall: [YES/NO] — [reason] — [N] node(s) have sufficient capacity."
+                "- Node: <node_name>\n"
+                "  CPU: <Table CPU AVAIL> >= <User's Requested CPU> -> <TRUE/FALSE>\n"
+                "  RAM: <Table RAM AVAIL> >= <User's Requested RAM> -> <TRUE/FALSE>\n"
+                "  Available on node?: <YES/NO>\n\n"
+                "Overall: [YES/NO] — [N] node(s) have sufficient capacity."
             ),
             "kubectl_exec": (
                 "Reproduce the command output VERBATIM. "
