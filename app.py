@@ -20,6 +20,7 @@ import config.config as config
 import tools.tools_k8s as _tk
 from rag import init_db, get_doc_stats, RAG_TOOLS, rag_retrieve, ingest_directory, ingest_file, ingest_excel
 from rag.retrieve import _MSG_NO_INGEST
+from rag.tool_index import ingest_tools, retrieve_tools          # ← NEW: semantic tool routing
 from tools.tools_k8s import reload_kubeconfig, _core as _k8s_core
 from tools.tools_metadata import K8S_TOOL_METADATA
 from agent.bypass import should_bypass_llm, BYPASS_NOTE, UNCONDITIONAL_BYPASS
@@ -201,6 +202,9 @@ def _build_llm():
         if is_qwen3: _log_ag.info("[LLM] Qwen3 detected — native tool-calling via apply_chat_template")
 
         device_map = "auto" if config.NUM_GPU > 0 else "cpu"
+        # FIX: restore conditional dtype — bfloat16 on GPU, float32 on CPU.
+        # bfloat16 is not natively supported for most CPU ops; PyTorch upcasts
+        # internally causing double memory use + large tensor spikes on CPU.
         dtype = torch.bfloat16 if config.NUM_GPU > 0 else torch.float32
 
         tokenizer = transformers.AutoTokenizer.from_pretrained(config.LLM_MODEL, trust_remote_code=True)
@@ -209,7 +213,9 @@ def _build_llm():
             torch_dtype=dtype,
             device_map=device_map,
             trust_remote_code=True,
-            use_cache=config.NUM_GPU > 0   # disable KV cache on CPU
+            # FIX: disable KV cache on CPU — it grows unboundedly in RAM
+            # during long generations and contributes to OOM spikes.
+            use_cache=config.NUM_GPU > 0,
         )
         model.eval()
         _log_ag.info("[LLM] Model loaded")
@@ -329,7 +335,7 @@ def build_agent():
             else:
                 _ns_prefix = f"§NS_PREFIX§I mapped the keyword in your question and scoped this check to the `{detected_ns}` namespace.§END_NS§\n\n"
 
-        _tool_char_limit = 40000 if config.NUM_GPU > 0 else 8000
+        _tool_char_limit = 40000
         parts = []
         for i, tr in enumerate(tool_results, 1):
             body = tr.content if len(tr.content) <= _tool_char_limit else tr.content[:_tool_char_limit] + "\n...[truncated]"
@@ -615,6 +621,9 @@ def build_agent():
 
         _max_new = max(512, config.MAX_NEW_TOKENS) if has_tool_results else max(1024, config.MAX_NEW_TOKENS // 2)
 
+        # ── Extract user query for semantic tool routing ──────────────────────
+        _user_q = next((m["content"] for m in chat_msgs if m["role"] == "user"), "")
+
         if tokenizer is None:
             format_rules = (
                 "\n\nTo call a tool, you MUST use exactly this JSON format. "
@@ -624,7 +633,13 @@ def build_agent():
                 "</tool_call>"
             )
 
-            tools_json = json.dumps(tool_schemas, indent=2)
+            # FIX: use semantic routing to select relevant tools instead of all schemas.
+            # For GGUF the schemas are injected as plain text into the system prompt,
+            # so we still benefit from a smaller tool list here.
+            _selected_schemas = retrieve_tools(_user_q, tool_schemas, top_k=8)
+            _log_ag.info(f"[REQ:{req_id}] [llm_node/gguf] semantic routing → {len(_selected_schemas)}/{len(tool_schemas)} tools selected")
+
+            tools_json = json.dumps(_selected_schemas, indent=2)
             tool_system = f"{prompt}\n\nAvailable tools:\n{tools_json}{format_rules}"
             gguf_msgs = [{"role": "system", "content": tool_system}] + chat_msgs[1:]
 
@@ -642,7 +657,15 @@ def build_agent():
         else:
             import torch
 
-            kw = {"add_generation_prompt": True, "tools": tool_schemas}
+            # FIX: use semantic routing — pass only relevant tool schemas to
+            # apply_chat_template instead of all 50+.
+            # This is the primary fix for the 160 GB RAM spike:
+            # fewer tools = shorter input sequence = dramatically smaller attention tensor.
+            # Falls back to all tools automatically if confidence is low.
+            _selected_schemas = retrieve_tools(_user_q, tool_schemas, top_k=8)
+            _log_ag.info(f"[REQ:{req_id}] [llm_node/hf] semantic routing → {len(_selected_schemas)}/{len(tool_schemas)} tools selected")
+
+            kw = {"add_generation_prompt": True, "tools": _selected_schemas}
             if _is_qwen3:
                 kw["enable_thinking"] = False
 
@@ -975,6 +998,18 @@ async def _lifespan(app: FastAPI):
 
     config.logger.info("[Agent] Pre-warming LLM…")
     get_agent()
+
+    # FIX: ingest all tool schemas into LanceDB for semantic routing.
+    # Must run AFTER get_agent() so K8S_TOOL_METADATA + RAG_TOOLS are fully loaded.
+    # Always-fresh strategy: drops and recreates the tool_index table every startup
+    # so any tool description changes are automatically picked up.
+    try:
+        all_tools = {**K8S_TOOL_METADATA, **RAG_TOOLS}
+        ingest_tools(all_tools)
+        config.logger.info(f"[tool_index] Ingested {len(all_tools)} tools into LanceDB ✓")
+    except Exception as e:
+        config.logger.error(f"[tool_index] Startup ingest failed (semantic routing will fall back to all tools): {e}")
+
     config.logger.info("Startup complete ✓")
 
     yield
@@ -1886,6 +1921,7 @@ async def api_kb_stream(req: KbAskRequest, request: Request):
             yield _sse({"type": "error", "text": str(exc)})
 
     return StreamingResponse(_generate(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
 @app.get("/api/prompt")
 async def api_get_prompt():
     if not _PROMPT_FILE.exists(): return _JSONResponse(status_code=404, content={"error": "config/system_prompt.txt not found"})
