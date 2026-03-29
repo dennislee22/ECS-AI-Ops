@@ -270,7 +270,7 @@ The application automatically detects available GPUs at startup and uses them if
 
 - **GPU (recommended)** — use **[Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)** (bfloat16, HuggingFace Transformers). Responses typically complete in **5–30 secs**, depending on the query complexity. Requires an NVIDIA GPU with at least 25 GB VRAM (e.g. A100, RTX 3090/4090).
 
-- **CPU ** — use **[Qwen/Qwen3-8B-GGUF](https://huggingface.co/Qwen/Qwen3-8B-GGUF)**, specifically the **Q4_K_M** quantisation, via `llama-cpp-python`. Responses take **30 secs - x minutes**, depending on the query complexity.
+- **CPU** — use **[Qwen/Qwen3-8B-GGUF](https://huggingface.co/Qwen/Qwen3-8B-GGUF)**, specifically the **Q4_K_M** quantisation, via `llama-cpp-python`. Responses take **30 secs - x minutes**, depending on the query complexity.
 
 ---
 
