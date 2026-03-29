@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 # -----------------------------
-# Configuration
+# Config
 # -----------------------------
 PORT = "9000"
 APP_PATH = Path.home() / "ECS-AI-Ops/app.py"
@@ -12,7 +12,6 @@ QWEN_DIR = MODELS_DIR / "Qwen3-8B"
 EMBED_DIR = MODELS_DIR / "nomic-embed-text-v1.5"
 LOG_FILE = Path.home() / "cpu-qwen3-app.log"
 
-# Public Hugging Face repositories
 QWEN_REPO = "https://huggingface.co/Qwen/Qwen3-8B"
 EMBED_REPO = "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5"
 
@@ -32,11 +31,9 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 def clone_if_missing(repo_url, path):
     if not path.exists():
         print(f"Cloning {repo_url} into {path}")
-        # subprocess.run waits for clone to complete
         subprocess.run(["git", "clone", repo_url, str(path)], check=True)
-        # Verify clone finished
         if not path.exists():
-            raise RuntimeError(f"Failed to clone {repo_url} into {path}")
+            raise RuntimeError(f"Failed to clone {repo_url}")
     else:
         print(f"{path} already exists, skipping clone")
 
@@ -48,7 +45,7 @@ clone_if_missing(EMBED_REPO, EMBED_DIR)
 # -----------------------------
 requirements_file = Path.home() / "ECS-AI-Ops/requirements.txt"
 if requirements_file.exists():
-    print(f"Installing Python dependencies from {requirements_file}")
+    print(f"Installing Python dependencies...")
     subprocess.run(["pip", "install", "--no-cache-dir", "-r", str(requirements_file)], check=True)
 
 # -----------------------------
@@ -58,8 +55,8 @@ print(f"Starting app on port {PORT}, logging to {LOG_FILE}")
 with open(LOG_FILE, "w") as f:
     subprocess.run([
         "python", str(APP_PATH),
-        "--host", "0.0.0.0",             # container-friendly
+        "--host", "0.0.0.0",
         "--port", PORT,
-        "--model-dir", str(QWEN_DIR),    # absolute path
-        "--embed-dir", str(EMBED_DIR)    # absolute path
+        "--model-dir", str(QWEN_DIR),
+        "--embed-dir", str(EMBED_DIR)
     ], stdout=f, stderr=subprocess.STDOUT)
