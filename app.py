@@ -460,32 +460,25 @@ def build_agent():
                 "Do NOT just list the pods—the total is the answer to a calculate question."
             ),
             "get_node_capacity": (
-                "The table above is the complete and final node capacity data. Do NOT call any tool.\n\n"
-                "If the user's question explicitly asks to create, schedule, or fit a pod AND provides "
-                "specific resource values to request "
-                "(e.g. 'create a pod with 2 vCPU', 'schedule a pod with 8GB', 'can I fit a pod requesting 4 cores'), "
-                "perform a fit-check. Do NOT reproduce the raw table. "
-                "UNIT RULES: CPU values in the table are in CORES. "
-                "Treat user CPU requests as CORES unless explicitly suffixed with 'm' (millicores). "
-                "800CPU = 800 cores, 2 vCPU = 2 cores, 500m = 0.5 cores. "
-                "Memory values in the table are in GiB. 8GB ≈ 8 GiB, 1256GB = 1256 GiB.\n"
-                "Evaluate each node:\n"
-                "Node: [Name]\n"
-                "CPU: [Avail] >= [Req] -> [TRUE/FALSE]\n"
-                "RAM: [Avail] >= [Req] -> [TRUE/FALSE]\n"
-                "Available on node?: [YES/NO]\n"
-                "Conclusion: [one sentence]\n\n"
-                "Then add ONE final line:\n"
-                "Overall: [YES/NO] — [reason] — [N] node(s) have sufficient capacity.\n\n"
-                "For all other questions (show, list, display, what is the capacity, how much CPU/RAM), "
-                "reproduce the table with a one-line intro. "
-                "Do NOT evaluate nodes. Do NOT add an Overall line. Do NOT perform a fit-check."
+                "The table above is the complete node capacity data. Do NOT call any tool.\n\n"
+                "CRITICAL INSTRUCTION: Look at the user's question. Does it contain specific numbers for a new pod's size (e.g., '2 vCPU', '8GB')?\n"
+                "- IF NO (e.g., 'what are the resources requested', 'show capacity'): Follow SCENARIO A.\n"
+                "- IF YES (e.g., 'can I fit a pod with 4 cores'): Follow SCENARIO B.\n\n"
+                "*** SCENARIO A (NO NUMBERS PROVIDED) ***\n"
+                "Reproduce the table output VERBATIM with a brief one-line intro. "
+                "Do NOT evaluate nodes. Do NOT perform a fit-check. Do NOT add an 'Overall' line. Stop writing immediately after the table.\n\n"
+                "*** SCENARIO B (NUMBERS PROVIDED) ***\n"
+                "Do NOT reproduce the raw table. Perform a fit-check against the user's requested numbers.\n"
+                "UNIT RULES: CPU values in the table are in CORES. Treat user CPU requests as CORES unless suffixed with 'm'. "
+                "800CPU = 800 cores, 2 vCPU = 2 cores, 500m = 0.5 cores. Memory values in the table are in GiB. 8GB ≈ 8 GiB.\n"
+                "Evaluate each node strictly using this format:\n"
+                "- Node: <node_name>\n"
+                "  CPU: <Table CPU AVAIL> >= <User's Requested CPU> -> <TRUE or FALSE>\n"
+                "  RAM: <Table RAM AVAIL> >= <User's Requested RAM> -> <TRUE or FALSE>\n"
+                "  Available on node?: <YES if BOTH CPU and RAM are TRUE, otherwise NO>\n\n"
+                "Then add ONE final line summarizing the results. Count exactly how many nodes evaluated to YES above. Use this format:\n"
+                "Overall: <YES if count > 0, else NO> — <Exact count of YES nodes> node(s) have sufficient capacity."
             ),
-            "kubectl_exec": (
-                "Reproduce the command output VERBATIM. "
-                "Do NOT reformat, summarise, or omit any rows."
-            ),
-        }
 
         _ENUMERATION_TOOLS = { # Unique common prompt
              "get_pod_logs",
