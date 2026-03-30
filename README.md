@@ -5,7 +5,7 @@
 - Search for known ECS/Longhorn incidents, best practices, and troubleshooting guides via RAG (LanceDB).
 - Air-gap–friendly deployment, it runs fully within isolated environments with no external internet access. The LLM can be hosted on GPU or CPU, no code changes required. 
 
-<img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png" alt="Dashboard" width="100"/>
+<img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png" alt="Dashboard" width="600"/>
 
 **What can it do?**
 
@@ -226,7 +226,7 @@ import os
 CDSW_APP_PORT=os.environ['CDSW_APP_PORT'] 
 os.system("python ~/ECS-AI-Ops/app.py --host 127.0.0.1 --port $CDSW_APP_PORT --model-dir ~/models/Qwen3-8B --embed-dir ~/models/nomic-embed-text-v1.5 2>&1 > myapp.log")
 ```
-![cml1](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/cml-ecsaiops.png)
+<img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png" alt="cml1" width="400"/>
 
 ---
 
