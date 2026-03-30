@@ -1,6 +1,9 @@
 <h1><img src="web/static/chatbot-icon.svg" width="30" height="30"> <img src="web/static/k8s-logo.svg" width="30" height="30"> Cloudera ECS AI Ops Chatbot <img src="web/static/rancher-logo.svg" width="50" height="50"> <img src="web/static/longhorn-logo.svg" width="30" height="30"> </h1>
 
-An Agentic AI assistant for your live **Cloudera ECS (Embedded Container Service)** cluster — ask it anything about your cluster in plain English and get informative answers. No `kubectl`, no YAML, needed. Only basic concept of Kubernetes is required. Air-gap–friendly deployment, it runs fully within isolated environments with no external internet access.
+- An Agentic AI assistant for your live **Cloudera ECS (Embedded Container Service)** cluster — ask it anything about your cluster in plain English and get informative answers.
+- No `kubectl`, no YAML, needed. Only basic concept of Kubernetes is required.
+- Search for known ECS/Longhorn incidents, best practices, and troubleshooting guides via RAG (LanceDB).
+- Air-gap–friendly deployment, it runs fully within isolated environments with no external internet access.
 
 ![Dashboard](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png)
 
@@ -11,7 +14,6 @@ An Agentic AI assistant for your live **Cloudera ECS (Embedded Container Service
 - 🔍 **Configuration and Settings**: retrieve configurations for Longhorn, secret, configMaps, and others.
 - 🔍 **Troubleshooting**: help diagnose issues with pods, services, and other cluster components.
 - 🔍 **Query databases directly**: run read-only SQL inside DB pods (MySQL, PostgreSQL) straight from the chat interface.
-- 📖 **RAG Doc Search**: Search for known incidents, best practices, and troubleshooting guides.
 
 ECS AI Ops Chatbot is powered by:
 
@@ -32,6 +34,7 @@ ECS AI Ops Chatbot is powered by:
 - [Kubernetes Tools](#kubernetes-tools)
 - [Example Queries](#example-queries)
 - [Quick Start](#quick-start)
+- [Quick Start in Openshift](#quick-start-in-openshift)
 - [REST API](#rest-api)
 - [Hardware Sizing](#hardware-sizing)
 - [Security Notes](#security-notes)
@@ -225,6 +228,55 @@ os.system("python ~/ECS-AI-Ops/app.py --host 127.0.0.1 --port $CDSW_APP_PORT --m
 
 ---
 
+## Quick Start in Openshift
+
+1. Create a Dockerfile on your machine (connected to Openshift cluster).
+```dockerfile
+FROM registry.redhat.io/ubi8/python-312
+USER root
+RUN yum install -y git-lfs && \
+    git lfs install && \
+    yum clean all
+USER 1001
+WORKDIR /opt/app-root/src
+COPY . .
+RUN pip install -r requirements.txt || true
+EXPOSE 8080
+CMD ["python", "app_starter.py"]
+```
+
+2. Run this command to create a new build using your Dockerfile.
+```bash
+oc new-build https://github.com/dennislee22/ECS-AI-Ops --name=ecs-ai-app --strategy=docker --dockerfile="$(cat Dockerfile)"
+```
+
+3. Create a route YAML file `cpu-ecs-aiops-route.yaml`.
+```yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ecs-ai-app
+  annotations:
+    haproxy.router.openshift.io/timeout: 5000s
+spec:
+  host: cpu-ecs-aiops.apps.yyy.com
+  path: /
+  to:
+    kind: Service
+    name: ecs-ai-app
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+```
+
+4. Apply the route.
+```bash
+oc apply -f cpu-ecs-aiops-route.yaml 
+```
+
+5. Open your browser and go to `http://cpu-ecs-aiops.apps.yyy.com`
+
+---
 ## REST API
 
 Interactive docs: **[/docs](http://localhost:8080/docs)** (Swagger) · **[/redoc](http://localhost:8080/redoc)**
