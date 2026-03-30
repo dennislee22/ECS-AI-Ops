@@ -226,6 +226,7 @@ import os
 CDSW_APP_PORT=os.environ['CDSW_APP_PORT'] 
 os.system("python ~/ECS-AI-Ops/app.py --host 127.0.0.1 --port $CDSW_APP_PORT --model-dir ~/models/Qwen3-8B --embed-dir ~/models/nomic-embed-text-v1.5 2>&1 > myapp.log")
 ```
+![cml1](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/cml-ecsaiops.png)
 
 ---
 
@@ -356,4 +357,4 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 
 ## Contact
 
-[<img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/linkedin.svg" alt="LinkedIn" width="20" height="20"/> dennislee22](https://www.linkedin.com/in/dennisleetw)
+[<img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/linkedin.svg" alt="LinkedIn" width="20" height="20"/>](https://www.linkedin.com/in/dennisleetw) dennisleetw
