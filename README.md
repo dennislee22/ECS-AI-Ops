@@ -251,7 +251,12 @@ CMD ["python", "app_starter.py"]
 oc new-build https://github.com/dennislee22/ECS-AI-Ops --name=ecs-ai-app --strategy=docker --dockerfile="$(cat Dockerfile)"
 ```
 
-3. Create a route YAML file `cpu-ecs-aiops-route.yaml`.
+3. After the build is completed, create a app pod.
+```bash
+oc new-app ecs-ai-app
+```
+
+4. Create a route YAML file `cpu-ecs-aiops-route.yaml`.
 ```yaml
 apiVersion: route.openshift.io/v1
 kind: Route
@@ -270,12 +275,12 @@ spec:
     targetPort: 8080-tcp
 ```
 
-4. Apply the route.
+5. Apply the route.
 ```bash
 oc apply -f cpu-ecs-aiops-route.yaml 
 ```
 
-5. Open your browser and go to `http://cpu-ecs-aiops.apps.yyy.com`
+6. Open your browser and go to `http://cpu-ecs-aiops.apps.yyy.com`
 
 ---
 ## REST API
@@ -351,4 +356,4 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 
 ## Contact
 
-[![LinkedIn](https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/linkedin.svg)](https://www.linkedin.com/in/dennisleetw)
+[<img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/linkedin.svg" alt="LinkedIn" width="20" height="20"/> dennislee22](https://www.linkedin.com/in/dennisleetw)
