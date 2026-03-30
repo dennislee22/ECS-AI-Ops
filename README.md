@@ -230,7 +230,7 @@ os.system("python ~/ECS-AI-Ops/app.py --host 127.0.0.1 --port $CDSW_APP_PORT --m
 
 ## Quick Start in Openshift
 
-1. Create a Dockerfile on your machine (connected to Openshift cluster).
+1. Create a `Dockerfile` on your machine (connected to Openshift cluster).
 ```dockerfile
 FROM registry.redhat.io/ubi8/python-312
 USER root
