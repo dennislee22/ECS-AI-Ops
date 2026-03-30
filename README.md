@@ -351,4 +351,4 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 
 ## Contact
 
-- LinkedIn: [dennislee22](https://www.linkedin.com/in/dennisleetw)
+[![LinkedIn](https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/linkedin.svg)](https://www.linkedin.com/in/dennisleetw))
