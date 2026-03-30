@@ -8,6 +8,7 @@ HOME_DIR = Path.home()
 APP_DIR = HOME_DIR
 MODELS_DIR = HOME_DIR / "models"
 QWEN_MODEL = MODELS_DIR / "Qwen3-8B"
+QWEN_GGUF_MODEL = MODELS_DIR / "Qwen3-8B-GGUF"
 EMBED_MODEL = MODELS_DIR / "nomic-embed-text-v1.5"
 LOG_FILE = HOME_DIR / "cpu-qwen3-app.log"
 
@@ -23,6 +24,7 @@ def clone_if_missing(repo_url, target_path):
     print(f"Cloned {repo_url} successfully")
 
 clone_if_missing("https://huggingface.co/Qwen/Qwen3-8B", QWEN_MODEL)
+clone_if_missing("https://huggingface.co/Qwen/Qwen3-8B-GGUF", QWEN_GGUF_MODEL)
 clone_if_missing("https://huggingface.co/nomic-ai/nomic-embed-text-v1.5", EMBED_MODEL)
 
 def list_model_files(model_path: Path):
@@ -44,7 +46,7 @@ cmd = [
     str(APP_DIR / "app.py"),
     "--host", "0.0.0.0",
     "--port", "8080",
-    "--model-dir", str(QWEN_MODEL),
+    "--model-dir", str(QWEN_GGUF_MODEL),
     "--embed-dir", str(EMBED_MODEL),
 ]
 
