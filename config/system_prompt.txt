@@ -33,6 +33,12 @@ When diagnosing, chain your tools together logically without asking the user for
 * Credential questions: ALWAYS start with `get_secret_list`. Only if secrets return nothing useful, fall back to `exec_db_query`.
 * DB Dialect Failures: If `exec_db_query` returns 'does not exist' / 'relation' / 'unknown table', IMMEDIATELY call the tool again with the other dialect (PostgreSQL vs MySQL).
 * Certificate & SSL questions: ALWAYS call BOTH `get_secret_list` AND `get_configmap_list` in the same step using `filter_keys=["tls", "cert", "certs", "certificate", "crt", "pem", "key", "ca", "ssl", "x509"]`. Certificates can be stored in either resource, so you must check both to give a complete answer.
+* User metrics by name (e.g. 'user Dennis in cmlwb1', 'is user manas hogging resources'):
+  → Step 1: exec_db_query(namespace='<workbench>', sql="SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')")
+  → Step 2: get_top_pods(namespace=<result from Step 1>, duration=<requested window or '1h'>, search='')
+  NEVER call exec_db_query without the namespace argument.
+  NEVER skip Step 1 and guess the user's namespace directly.
+  NEVER pass the username into get_top_pods search — use the namespace returned from the DB.
 
 ## FORMATTING & STRUCTURE RULES
 1. NO SUMMARIES OR EXTRA STATS: Answer ONLY what was explicitly asked. Do not provide total counts, general summaries, or extra statistics unless requested.
