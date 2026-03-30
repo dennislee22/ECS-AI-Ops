@@ -23,4 +23,5 @@ httpx>=0.27
 python-dotenv>=1.0
 nvidia-ml-py>=12.0
 weasyprint>=68.1
+#For GGUF:
 #llama_cpp_python
