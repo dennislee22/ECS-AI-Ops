@@ -210,7 +210,7 @@ LOG_LEVEL=warning
 ```bash
 # Usage:
 python3 app.py --host 0.0.0.0                               # bind address
-python3 app.py --port 9000                                  # custom port
+python3 app.py --port 8080                                  # custom port
 python3 app.py --model-dir  ~/models/Qwen3-8B               # LLM from local dir
 python3 app.py --embed-dir  ~/models/nomic-embed-text-v1.5  # embeddings from local dir
 ```
@@ -227,7 +227,7 @@ os.system("python ~/ECS-AI-Ops/app.py --host 127.0.0.1 --port $CDSW_APP_PORT --m
 
 ## REST API
 
-Interactive docs: **[/docs](http://localhost:9000/docs)** (Swagger) · **[/redoc](http://localhost:9000/redoc)**
+Interactive docs: **[/docs](http://localhost:8080/docs)** (Swagger) · **[/redoc](http://localhost:8080/redoc)**
 
 | Method | Path | Description |
 |---|---|---|
@@ -237,24 +237,18 @@ Interactive docs: **[/docs](http://localhost:9000/docs)** (Swagger) · **[/redoc
 
 #### Ask the AI chatbot (blocking)
 ```bash
-curl -s -X POST http://localhost:9000/api/ask \
+curl -s -X POST http://localhost:8080/api/ask \
      -H "Content-Type: application/json" \
      -d '{"q":"list all pods with problems", "skip_synthesise": true}'
 ```
 
 #### Call a specific ECS-K8s tool directly
 ```bash
-curl -s -X POST http://localhost:9000/api/tool \
+curl -s -X POST http://localhost:8080/api/tool \
      -H "Content-Type: application/json" \
      -d '{"name":"get_pod_status","args":{"namespace":"cdp"}}'
 "
 ```
-
-### Sample API Output
-
-| Inference | Log |
-|---|---|
-| GPU (A100 80GB) | [test-API-GPU-A100-80GB-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gpu_test_api.log) |
 
 ---
 
@@ -271,6 +265,14 @@ The application automatically detects available GPUs at startup and uses them if
 - **GPU (recommended)** — use **[Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)** (bfloat16, HuggingFace Transformers). Responses typically complete in **5–30 secs**, depending on the query complexity. Requires an NVIDIA GPU with at least 25 GB VRAM (e.g. A100, RTX 3090/4090).
 
 - **CPU** — use **[Qwen/Qwen3-8B-GGUF](https://huggingface.co/Qwen/Qwen3-8B-GGUF)**, specifically the **Q4_K_M** quantisation, via `llama-cpp-python`. Responses take **30 secs - x minutes**, depending on the query complexity.
+
+You may examine the time taken to execute each query, using GPU, CPU, and CPU (GGUF):
+
+| Inference | Log |
+|---|---|
+| GPU (A100 80GB PCIe) | [test-API-GPU-A100-80GB-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gpu_test_api.log) |
+| CPU | [test-API-CPU-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/cpu_test_api.log) |
+| CPU (GGUF)| [test-API-GGUF-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gguf_test_api.log) |
 
 ---
 
