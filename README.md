@@ -291,7 +291,7 @@ Interactive docs: **[/docs](http://localhost:8080/docs)** (Swagger) · **[/redoc
 | POST | `/api/tool` | Call a K8s tool directly |
 
 
-#### Ask the AI chatbot (blocking)
+#### Ask the ECS AI Ops Chatbot
 ```bash
 curl -s -X POST http://localhost:8080/api/ask \
      -H "Content-Type: application/json" \
