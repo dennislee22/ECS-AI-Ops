@@ -116,8 +116,7 @@ ECS AI Ops Chatbot is powered by:
 | Config | `get_configmap_list`, `get_secret_list`, `get_resource_quotas`, `get_limit_ranges` |
 | RBAC | `get_serviceaccounts`, `get_cluster_role_bindings` |
 | Namespaces | `get_namespace_status`, `get_namespace_resource_summary` |
-| Database | `exec_db_query` — read-only SQL inside DB pods (MySQL/MariaDB/PostgreSQL) |
-| RAG | `rag_search` — searches ingested spreadsheet and known-issues docs |
+| Database | `exec_db_query` — read-only SQL inside DB pods (MySQL/PostgreSQL) |
 
 ---
 
