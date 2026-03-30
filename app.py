@@ -97,11 +97,14 @@ IGNORE_NS = {
 # GGUF (CPU):
 #_ROUTING_TOP_K_GGUF = 5
 _ROUTING_TOP_K_GGUF = 3
+#_ROUTING_THRESHOLD_HF = 0.65
 _ROUTING_THRESHOLD_GGUF = 0.55
 
 # HuggingFace (GPU):
-_ROUTING_TOP_K_HF = 7
-_ROUTING_THRESHOLD_HF = 0.65
+#_ROUTING_TOP_K_HF = 7
+_ROUTING_TOP_K_HF = 3
+#_ROUTING_THRESHOLD_HF = 0.65
+_ROUTING_THRESHOLD_HF = 0.55
 
 def _sse(payload: dict) -> str:
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
