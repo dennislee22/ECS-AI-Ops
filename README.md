@@ -5,7 +5,7 @@
 - Search for known ECS/Longhorn incidents, best practices, and troubleshooting guides via RAG (LanceDB).
 - Air-gap–friendly deployment, it runs fully within isolated environments with no external internet access. The LLM can be hosted on GPU or CPU, no code changes required. 
 
-![Dashboard](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png)
+<img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-dashboard1.png" alt="Dashboard" width="400"/>
 
 **What can it do?**
 
