@@ -39,7 +39,7 @@ _VERBATIM = (
 
 K8S_TOOL_METADATA: dict = {
 
-"find_resource": {
+    "find_resource": {
         "fn":               find_resource,
         "embed_keywords":   "find locate search where is running resource name pod deployment service ingress pvc configmap secret daemonset statefulset replicaset anywhere cluster",
         "description": (
@@ -82,10 +82,13 @@ K8S_TOOL_METADATA: dict = {
                     "Optional resource type to restrict the search. Accepted values: "
                     "'pod', 'deployment', 'daemonset', 'statefulset', 'replicaset', "
                     "'svc' or 'service', 'ingress', 'pvc', 'configmap', 'secret'. "
-                    "CRITICAL INSTRUCTION: If the user explicitly includes a resource type in their question "
-                    "(e.g., 'where is grafana pod', 'find nginx deployment'), you MUST set this parameter to that type "
-                    "(e.g., 'pod', 'deployment'). Do NOT pass null if the user mentions a specific type! "
-                    "Only omit (None) if they do not mention a type at all (e.g., 'where is grafana')."
+                    "CRITICAL INSTRUCTION: Only set this if the user explicitly states a resource "
+                    "type in their question. NEVER infer a type that the user did not explicitly say. "
+                    "EXAMPLE: 'where is grafana' → resource_type=None (search ALL types) "
+                    "EXAMPLE: 'where is grafana pod' → resource_type='pod' "
+                    "EXAMPLE: 'find grafana service' → resource_type='svc' "
+                    "EXAMPLE: 'where is nginx deployment' → resource_type='deployment' "
+                    "When in doubt, always leave resource_type=None to search all types."
                 ),
             },
             "namespace":      _P_NS,
