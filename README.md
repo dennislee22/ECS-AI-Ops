@@ -43,6 +43,7 @@ ECS AI Ops Chatbot is powered by:
 
 ```
 ├── app.py                    # FastAPI server + LangGraph agent
+├── ocp_buildapp.py           # Build and run in Openshift
 │
 ├── config/
 │   ├── __init__.py
