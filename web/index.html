@@ -1157,6 +1157,20 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all namespaces with total pods</span><button class="gl-copy-btn" onclick="glCopy(this,'list all namespaces with total pods')">copy</button></div></div>
         <div class="gl-ex-note">Returns every namespace with its pod count.</div>
 
+        <h3>Resources &amp; Compute</h3>
+        <span class="gl-tag gl-tag-resource">RESOURCE</span>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all replicaset in cdp-keda namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all replicaset in cdp-keda namespace')">copy</button></div></div>
+        <div class="gl-ex-note">Lists ReplicaSets in cdp-keda with replica health status.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">what's the cpu and ram request for cdp-embedded-db pod in cdp namespace?</span><button class="gl-copy-btn" onclick="glCopy(this,'what\'s the cpu and ram request for cdp-embedded-db pod in cdp namespace?')">copy</button></div></div>
+        <div class="gl-ex-note">Shows CPU and memory requests and limits per container in the pod.</div>
+
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">I want to create a pod with 2 vCPU &amp; 8 GB memory, does the cluster have enough available capacity?</span><button class="gl-copy-btn" onclick="glCopy(this,'I want to create a pod with 2 vCPU & 8 GB memory, does the cluster have enough available capacity?')">copy</button></div></div>
+        <div class="gl-ex-note">Checks allocatable CPU and memory per node against what's already requested, then tells you which node(s) can fit the pod.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">calculate CPU requests for all pods in longhorn-system namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'calculate CPU requests for all pods in longhorn-system namespace')">copy</button></div></div>
+        <div class="gl-ex-note">Aggregates CPU and memory requests/limits for every pod in the namespace in one call.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">How much capacity is available to be requested for each node?</span><button class="gl-copy-btn" onclick="glCopy(this,'How much capacity is available to be requested for each node?')">copy</button></div></div>
+        <div class="gl-ex-note">Shows the allocatable CPU and memory remaining on each node in %.</div>
+
         <h3>Nodes &amp; Taints</h3>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list nodes tainted with "control"</span><button class="gl-copy-btn" onclick="glCopy(this,'list nodes tainted with &quot;control&quot;')">copy</button></div></div>
@@ -1170,7 +1184,6 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-note">Checks CoreDNS pod health in kube-system, reads /etc/resolv.conf, and runs a live nslookup against a real cluster hostname to verify DNS resolution end-to-end.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which namespace contains ingress port 443?</span><button class="gl-copy-btn" onclick="glCopy(this,'which namespace contains ingress port 443?')">copy</button></div></div>
         <div class="gl-ex-note">Searches all ingress resources across namespaces for TLS / port-443 exposure.</div>
-
 
         <h3>Graphs &amp; Metrics</h3>
         <span class="gl-tag gl-tag-resource">RESOURCE</span>
@@ -1190,7 +1203,7 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-storage"></div><div class="gl-ex-body"><span class="gl-ex-text">show me all snapshot related settings in Longhorn</span><button class="gl-copy-btn" onclick="glCopy(this,'show me all snapshot related settings in Longhorn')">copy</button></div></div>
         <div class="gl-ex-note">Retrieves all Longhorn settings related to snapshots, including recurring snapshot schedules, snapshot data integrity checks, and cleanup policies.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-storage"></div><div class="gl-ex-body"><span class="gl-ex-text">Is longhorn healthy?</span><button class="gl-copy-btn" onclick="glCopy(this,'Is longhorn healthy?')">copy</button></div></div>
-        <div class="gl-ex-note">Checks all Longhorn nodes for disk pressure, overcommit ratio, schedulability, and node condition warnings such as missing packages or unloaded kernel modules.</div>
+        <div class="gl-ex-note">Checks all Longhorn nodes for disk pressure, overcommit ratio and schedulability.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">List all pv that consume more than 80% of the allocated disk capacity</span><button class="gl-copy-btn" onclick="glCopy(this,'List all pv that consume more than 80% of the allocated disk capacity')">copy</button></div></div>
         <div class="gl-ex-note">Queries all Persistent Volumes in the cluster and filters those whose used disk capacity exceeds 80% of their allocated size.</div>
 
@@ -1200,18 +1213,6 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-note">Lists TLS/cert secrets in the cdp namespace. Enable <strong>Show Secret Values</strong> in Settings to decode.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-secret"></div><div class="gl-ex-body"><span class="gl-ex-text">Decode cdp-private-installer-db-root-cert secret in cdp ns</span><button class="gl-copy-btn" onclick="glCopy(this,'Decode cdp-private-installer-db-root-cert secret in cdp ns')">copy</button></div></div>
         <div class="gl-ex-note">Decodes and shows the full certificate value. Requires <strong>Show Secret Values</strong> to be enabled in Settings → Security.</div>
-
-        <h3>Resources &amp; Compute</h3>
-        <span class="gl-tag gl-tag-resource">RESOURCE</span>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all replicaset in cdp-keda namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all replicaset in cdp-keda namespace')">copy</button></div></div>
-        <div class="gl-ex-note">Lists ReplicaSets in cdp-keda with replica health status.</div>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">what's the cpu and ram request for cdp-embedded-db pod in cdp namespace?</span><button class="gl-copy-btn" onclick="glCopy(this,'what\'s the cpu and ram request for cdp-embedded-db pod in cdp namespace?')">copy</button></div></div>
-        <div class="gl-ex-note">Shows CPU and memory requests and limits per container in the pod.</div>
-
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">I want to create a pod with 2 vCPU &amp; 8 GB memory, does the cluster have enough available capacity?</span><button class="gl-copy-btn" onclick="glCopy(this,'I want to create a pod with 2 vCPU & 8 GB memory, does the cluster have enough available capacity?')">copy</button></div></div>
-        <div class="gl-ex-note">Checks allocatable CPU and memory per node against what's already requested, then tells you which node(s) can fit the pod.</div>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">calculate CPU requests for all pods in longhorn-system namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'calculate CPU requests for all pods in longhorn-system namespace')">copy</button></div></div>
-        <div class="gl-ex-note">Aggregates CPU and memory requests/limits for every pod in the namespace in one call.</div>
 
         <h3>Cloudera AI (CAI)</h3>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
