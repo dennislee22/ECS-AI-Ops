@@ -60,7 +60,6 @@ ECS AI Ops Chatbot is powered by:
 │   └── bypass.py             # LLM synthesis bypass for simple list queries
 ├── tools/
 │   ├── __init__.py
-│   ├── tool_index.py         # Index K8s tools for LanceDB to speed up tool selection by LLM
 │   ├── tools_k8s.py          # K8s tools
 │   └── tools_metadata.py     # K8s tools metadata
 ├── web/
@@ -73,6 +72,7 @@ ECS AI Ops Chatbot is powered by:
 │       └── marked.min.js
 ├── rag/
 │   ├── __init__.py
+│   ├── tool_index.py         # Index K8s tools for LanceDB to speed up tool selection by LLM
 │   ├── ingest.txt            # Ingest document
 │   ├── retrieve.py           # Retrieve RAG data
 │   ├── store.py              # Store RAG
