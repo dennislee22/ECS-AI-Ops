@@ -324,10 +324,10 @@ The application automatically detects available GPUs at startup and uses them if
 
 You may examine the time taken to execute each query, using GPU, CPU, and CPU (GGUF):
 
-| Inference | Log |
-|---|---|
-| GPU (A100 80GB PCIe) | [test-API-GPU-A100-80GB-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gpu_test_api.log) |
-| CPU (GGUF)| [test-API-GGUF-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gguf_test_api_skip.log) |
+| Inference | Skip Synthesis? | Log |
+|---|---|---|
+| GPU (A100 80GB PCIe) | No | [test-API-GPU-A100-80GB-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gpu_test_api.log) |
+| CPU (GGUF)| Yes | [test-API-GGUF-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gguf_test_api_skip.log) |
 
 ---
 
