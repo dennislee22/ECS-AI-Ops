@@ -1,7 +1,7 @@
 <h1><img src="web/static/chatbot-icon.svg" width="30" height="30"> <img src="web/static/k8s-logo.svg" width="30" height="30"> Cloudera ECS AI Ops Chatbot <img src="web/static/rancher-logo.svg" width="50" height="50"> <img src="web/static/longhorn-logo.svg" width="30" height="30"> </h1>
 
 - An Agentic AI assistant for your live **Cloudera ECS (Embedded Container Service)** cluster — ask it anything about your cluster in plain English and get informative answers.
-- No need to memorize `kubectl` or deal with tedious YAML/JSON; only a basic understanding of Kubernetes is required.
+- No need to memorize `kubectl` commands or deal with tedious YAML/JSON; only a basic understanding of Kubernetes is required.
 - Search for known ECS/Longhorn incidents, best practices, and troubleshooting guides via RAG (LanceDB).
 - Air-gap–friendly deployment, it runs fully within isolated environments with no external internet access.
 
