@@ -1111,7 +1111,7 @@ K8S_TOOL_METADATA: dict = {
         },
     },
 
-    "exec_db_query": {
+"exec_db_query": {
         "fn":               exec_db_query,
         "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace information data queries who is user owner username lookup resolve cmlwb1 workbench identity",
         "description": (
@@ -1131,18 +1131,21 @@ K8S_TOOL_METADATA: dict = {
             "MANDATORY ARGUMENT RULE: `namespace` is ALWAYS required. NEVER call this tool without it. "
             "If you do not yet know the namespace, look it up first before calling this tool. "
             "CUSTOM RULE — USER/NAMESPACE RESOLUTION: "
-            "Detect the input type first before writing the SQL: "
-            "IF the input matches the pattern '*-user-N' (e.g. 'cmlwb1-user-1', 'cmlwb2-user-3') "
-            "→ it is a NAMESPACE string. "
-            "→ SQL filter value = the FULL string as-is: SELECT username FROM users WHERE LOWER(namespace)=LOWER('cmlwb1-user-1') "
-            "→ namespace argument (where the DB pod runs) = prefix before '-user-' only (e.g. 'cmlwb1-user-1' → 'cmlwb1') "
+            "IF the input contains '-user-' (e.g. 'cmlwb1-user-1', 'cmlwb2-user-3'): "
+            "→ SELECT username FROM users WHERE LOWER(namespace)=LOWER('cmlwb1-user-1') "
+            "   namespace arg = 'cmlwb1' (prefix before '-user-') "
+            "   sql WHERE value = 'cmlwb1-user-1' (full string, never truncated) "
+            "EXAMPLE: user asks 'who is cmlwb1-user-1 in cmlwb1' "
+            "→ exec_db_query(namespace='cmlwb1', sql=\"SELECT username FROM users WHERE LOWER(namespace)=LOWER('cmlwb1-user-1')\") "
+            "IF the input has NO '-user-' (e.g. 'Dennis', 'manas'): "
+            "→ SELECT namespace FROM users WHERE LOWER(username)=LOWER('dennis') "
+            "   namespace arg = workbench stated by user (e.g. 'cmlwb1') "
+            "EXAMPLE: user asks 'what namespace is Dennis in cmlwb1' "
+            "→ exec_db_query(namespace='cmlwb1', sql=\"SELECT namespace FROM users WHERE LOWER(username)=LOWER('dennis')\") "
+            "CRITICAL: '-user-' in input → SELECT username. No '-user-' in input → SELECT namespace. "
             "NEVER truncate the input string in the SQL WHERE clause — use it in full. "
-            "The prefix is ONLY used as the namespace argument, NOT as the SQL filter value. "
-            "IF the input is a plain name without '-user-' (e.g. 'Dennis', 'manas') "
-            "→ it is a USERNAME string. Query: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>') "
-            "→ workbench namespace argument is explicitly stated by the user (e.g. 'in cmlwb1') "
             "NEVER use SELECT namespace when the input contains '-user-'. "
-            "NEVER use SELECT username when the input is a plain name without '-user-'. "
+            "NEVER use SELECT username when the input has no '-user-'. "
             "USER METRICS CHAIN: If the query asks for resource usage for a specific user "
             "(e.g. 'is user Dennis hogging resources', 'top pods for user manas'): "
             "→ Step 1: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>') "
@@ -1194,7 +1197,7 @@ K8S_TOOL_METADATA: dict = {
 
     "get_top_pods": {
         "fn":               get_top_pods,
-        "embed_keywords":   "top pods metrics cpu memory ram usage graph highest lowest live historical data trend performance",
+        "embed_keywords":   "top pods metrics cpu memory ram usage usage graph highest lowest live historical data trend performance",
         "description": (
             "Show live or historical CPU and memory usage for pods, ranked highest or lowest. "
             "ALWAYS emits both a ranked table AND a time-series graph in the output. "
@@ -1211,9 +1214,10 @@ K8S_TOOL_METADATA: dict = {
             "'lowest cpu pods', "
             "'which pods use the least memory over the last 6 hours', "
             "'show top 3 pods by cpu and memory'. "
-            "CRITICAL: If the query mentions a specific user by name (e.g. 'user Dennis', 'user manas'), "
-            "you MUST follow the USER NAMESPACE RESOLUTION rule in the system prompt before calling this tool. "
-            "Do NOT call this tool directly without first resolving the user's namespace via exec_db_query. "
+            "CRITICAL USER METRICS RULE: If the prompt asks for metrics for a specific user, REGARDLESS OF CAPITALIZATION (e.g. 'user dennis', 'user Dennis', 'user manas', 'for Dennis'), you MUST NOT call get_top_pods directly. "
+            "Step 1: Call `exec_db_query` with sql=\"SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')\" to find their namespace (this ensures case-insensitivity). "
+            "Step 2: Call `get_top_pods` using ONLY the exact namespace string returned from the database (e.g. 'cmlwb1-user-1'), leave `search` empty, "
+            "and ALWAYS set `duration` (e.g. '1h' or the requested window) to fetch from Prometheus. "
             "Do NOT use get_top_nodes for ranked pod lists — use this tool. "
             "IMPORTANT: When the user asks for a graph or chart of top pods, "
             "ALWAYS set duration (e.g. '1h') to get the time-series data needed for the graph. "
@@ -1243,17 +1247,17 @@ K8S_TOOL_METADATA: dict = {
                 "default":     False,
                 "description": "When True, show lowest consumers first. Set True for: 'lowest pods', 'least cpu', 'bottom pods', 'minimum usage'.",
             },
-            "search":    {**_P_SEARCH, "description": "Optional pod name or namespace filter. If you resolved a user's namespace via exec_db_query, pass it via the namespace parameter instead — leave search empty."},
-            "duration":  {
-                "type":        "string",
-                "default":     "1h",
-                "description": "Time window (e.g., '1h', '24h', '7d', '30d', '90d'). For months, use days (1 month = '30d', 3 months = '90d').",
+            "search":    {**_P_SEARCH, "description": "Optional pod name or namespace filter. CRITICAL: If you just ran a DB query to find a user's namespace, you MUST set search='' (empty string). Do NOT pass the username into this field."},
+            "duration": {
+                "type": "string",
+                "default": "1h",
+                "description": "Time window (e.g., '1h', '24h', '7d', '30d', '90d'). For months, use days (1 month = '30d', 3 months = '90d')."
             },
             "memory_unit": {
-                "type":        "string",
-                "enum":        ["Mi", "Gi"],
-                "default":     "Mi",
-                "description": "The unit for memory metrics. Default is Mi. If the user asks for GB or Gi, set this to Gi.",
+                "type": "string",
+                "enum": ["Mi", "Gi"],
+                "default": "Mi",
+                "description": "The unit for memory metrics. Default is Mi. If the user asks for GB or Gi, set this to Gi."
             },
             "user_timezone": {
                 "type":        "string",
