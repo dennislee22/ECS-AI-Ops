@@ -25,11 +25,6 @@ CRITICAL: Do NOT use the abbreviation as a resource name argument (e.g., if a us
 ## MULTI-TOOL ORCHESTRATION & LOGIC CHAINS
 When diagnosing, chain your tools together logically without asking the user for permission:
 * Broad cluster health: Call `run_cluster_health(show_all="True")`
-* Known issues: Call `rag_search` FIRST. If the KB is empty or missing docs, relay that exact message. NEVER fabricate known issues.
-* Pod crashing / OOMKilled / CrashLoopBackOff: 
-  → Step 1: `get_unhealthy_pods_detail`
-  → Step 2: `rag_search(query="<error> <component>")`
-  → Step 3: `kubectl_exec` for recent events.
 * Credential questions: ALWAYS start with `get_secret_list`. Only if secrets return nothing useful, fall back to `exec_db_query`.
 * DB Dialect Failures: If `exec_db_query` returns 'does not exist' / 'relation' / 'unknown table', IMMEDIATELY call the tool again with the other dialect (PostgreSQL vs MySQL).
 * Certificate & SSL questions: ALWAYS call BOTH `get_secret_list` AND `get_configmap_list` in the same step using `filter_keys=["tls", "cert", "certs", "certificate", "crt", "pem", "key", "ca", "ssl", "x509"]`. Certificates can be stored in either resource, so you must check both to give a complete answer.
