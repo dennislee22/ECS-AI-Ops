@@ -1114,9 +1114,9 @@ K8S_TOOL_METADATA: dict = {
         },
     },
 
-"exec_db_query": {
+    "exec_db_query": {
         "fn":               exec_db_query,
-        "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup resolve workbench resources",
+        "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup resolve workbench workspace identity resources metrics usage information",
         "description": (
             "Execute a read-only SQL query inside a running database pod in a Kubernetes namespace. "
             "Supports MySQL, MariaDB, and PostgreSQL, auto-detected from the container image or name. "
