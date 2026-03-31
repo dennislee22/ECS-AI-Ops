@@ -5,7 +5,7 @@ from tools.tools_k8s import (
     get_pvc_status, get_cluster_version, get_storage_classes, get_endpoints,
     get_node_capacity, get_persistent_volumes, get_service, get_ingress, describe_pv,
     get_configmap_list, get_secret_list, get_resource_quotas, get_limit_ranges,
-    get_serviceaccounts, get_cluster_role_bindings, get_namespace_status, get_top_pod_requests,
+    get_serviceaccounts, get_cluster_role_bindings, get_namespace_status, get_workspace_top_requests,
     get_pod_tolerations, run_cluster_health, get_replicaset, get_crds, get_longhorn_node_status,
     get_namespace_resource_summary, get_pod_images, get_unhealthy_pods_detail,
     get_coredns_health, get_pv_usage, find_resource, get_pod_containers_resources, get_cronjob_status,
@@ -1253,6 +1253,43 @@ K8S_TOOL_METADATA: dict = {
                 "type":        "string",
                 "default":     "UTC",
                 "description": "User's IANA timezone. Auto-injected from browser.",
+            },
+        },
+    },
+
+    "get_workspace_top_requests": {
+        "fn":               get_workspace_top_requests,
+        "embed_keywords":   "top pods requests allocation reserved metrics workbench workspace user cpu memory ram graph highest lowest historical trend",
+        "description": (
+            "Query the workspace's Postgres 'sense' database to find the top historical CPU and memory requests for workloads (dashboards) over a specific time period. "
+            "Use this when the user explicitly asks for top CPU or memory 'requests' or 'limits' over the past X days/hours for a workspace or a specific user. "
+            "This checks resource allocation recorded directly in the CML database tables, NOT active Prometheus usage. "
+            "Because this queries a workspace database, a specific workspace namespace MUST be provided."
+        ),
+        "parameters":  {
+            "namespace": {
+                "type":        "string",
+                "description": "REQUIRED. The workspace namespace (e.g., 'cmlwb1'). NEVER omit this.",
+            },
+            "limit":     {
+                "type":        "integer",
+                "default":     10,
+                "description": "Number of records to return. Default is 10.",
+            },
+            "sort_by":   {
+                "type":        "string",
+                "default":     "cpu",
+                "description": "Sort metric: 'cpu' (default) or 'memory'.",
+            },
+            "duration": {
+                "type": "string",
+                "default": "30d",
+                "description": "Time window to look back (e.g., '20d', '7d', '1h', '2w'). Extracts directly from user query."
+            },
+            "search": {
+                "type": "string",
+                "default": "",
+                "description": "Optional keyword to filter by username, workload name, or status (e.g., 'Dennis', 'Running')."
             },
         },
     },

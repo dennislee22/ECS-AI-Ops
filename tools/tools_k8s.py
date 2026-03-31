@@ -1664,288 +1664,141 @@ def _enrich_cml_usernames(namespaces: set) -> dict:
             
     return mapping
 
-def get_top_pod_requests(namespace: str = "all", limit: int = 10, sort_by: str = "cpu",
-                 ascending: bool = False, search: str = "", duration: str = "",
-                 user_timezone: str = "UTC", step: str = "10s", memory_unit: str = "Mi") -> str:
-    import time as _time
+def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "cpu",
+                               duration: str = "30d", search: str = "") -> str:
+    import re
+    import json
+    import time
     import datetime
-    from datetime import timezone
-    import json as _json
-
-    _LOWEST_WORDS = {"lowest", "least", "bottom", "smallest", "lightest", "minimum", "min", "low"}
-    if sort_by.strip().lower() in _LOWEST_WORDS:
-        sort_by   = "cpu"
-        ascending = True
-
-    _BOTH_WORDS = {"both", "all", "cpu and memory", "memory and cpu", "cpu and ram", "ram and cpu"}
-    if sort_by.strip().lower() in _BOTH_WORDS:
-        sort_by = "both"
-
-    sort_key_label = "CPU" if sort_by.lower() in ("cpu", "cpu_m") else ("both" if sort_by == "both" else "memory")
-    direction      = "lowest" if ascending else "top"
-    scope          = f"namespace `{namespace}`" if namespace != "all" else "all namespaces"
-    filter_note    = f" matching `{search}`" if search else ""
-    tz_label       = user_timezone if user_timezone != "UTC" else "UTC"
-
-    # Pass the new arguments down to the historical Prometheus function
-    if duration:
-        return _get_top_pod_requests_prometheus(
-            namespace=namespace, limit=limit, sort_by=sort_by,
-            ascending=ascending, search=search, duration=duration,
-            user_timezone=user_timezone, step=step, memory_unit=memory_unit)
-
-    # Live snapshot from the Kubernetes API
-    try:
-        pods = _list_pods(namespace)
-    except ApiException as e:
-        return _api_error(e)
-    except Exception as e:
-        return _k8s_err(e)
-
-    if not pods:
-        return f"No pods found in namespace '{namespace}'."
-
-    try:
-        import zoneinfo
-        tz      = zoneinfo.ZoneInfo(user_timezone)
-        now_str = datetime.datetime.now(tz).strftime(f"%Y-%m-%d %H:%M {tz_label}")
-    except Exception:
-        now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-
-    mem_is_gi = memory_unit.lower() in ("gi", "g", "gb")
-    mem_label = "Gi" if mem_is_gi else "Mi"
-
-    rows = []
-    for pod in pods:
-        ns_v = pod.metadata.namespace
-        name = pod.metadata.name
-        if search and search.lower() not in name.lower() and search.lower() not in ns_v.lower():
-            continue
-            
-        cpu_req_m = 0
-        mem_req_mib = 0.0
+    
+    table_name = "dashboards"
+    
+    # Protect against empty or cluster-wide namespaces
+    if not namespace or namespace.lower() in ("all", "default"):
+        return "[ERROR] A specific workspace namespace (e.g., 'cmlwb1') is required to query the workspace database."
         
-        for c in (pod.spec.containers or []):
-            req = c.resources.requests or {}
-            cpu_req_m += _parse_cpu_to_millicores(req.get("cpu", "0"))
-            mem_req_mib += _parse_mem_to_mib(req.get("memory", "0"))
-            
-        mem_val = mem_req_mib / 1024.0 if mem_is_gi else mem_req_mib
-        rows.append((ns_v, name, cpu_req_m, mem_val))
-
-    if not rows:
-        return (f"No pods found matching `{search}`." if search else "No pods found.")
-
-    sk = 2 if sort_by.lower() in ("cpu", "cpu_m") else 3
-    rows.sort(key=lambda x: x[sk], reverse=not ascending)
-    rows = rows[:max(1, limit)]
-
-    # Enrich CML usernames
-    ns_set = {r[0] for r in rows if r[0] != "-"}
-    if ns_set:
-        ns_map = _enrich_cml_usernames(ns_set)
-        rows = [(ns_map.get(r[0], r[0]), r[1], r[2], r[3]) for r in rows]
-
-    header  = (f"{direction.title()} {len(rows)} pods by {sort_key_label} REQUESTS "
-               f"in {scope}{filter_note} — live snapshot at {now_str}.")
-    col_ns  = max(len("NAMESPACE"), max(len(r[0]) for r in rows))
-    col_pod = max(len("POD"),       max(len(r[1]) for r in rows))
+    # Parse duration into a valid Postgres INTERVAL
+    m = re.match(r"^(\d+)(h|d|w|m)$", duration.strip().lower())
+    if m:
+        val, unit = m.groups()
+        unit_map = {"h": "hours", "d": "days", "w": "weeks", "m": "months"}
+        sql_interval = f"{val} {unit_map[unit]}"
+    else:
+        sql_interval = "30 days"
+        
+    # Determine sort column
+    sort_col = "cpu" if "cpu" in sort_by.lower() else "memory"
     
-    hdr_row = f"{'NAMESPACE':<{col_ns}}  {'POD':<{col_pod}}  {'CPU_REQ(m)':>10}  {f'MEM_REQ({mem_label})':>13}"
-    sep     = "-" * len(hdr_row)
-    lines   = [header, "```", hdr_row, sep]
-    for ns_v, name, cpu_m, mem_val in rows:
-        if mem_is_gi:
-            lines.append(f"{ns_v:<{col_ns}}  {name:<{col_pod}}  {cpu_m:>9}m  {mem_val:>11.2f}{mem_label}")
-        else:
-            lines.append(f"{ns_v:<{col_ns}}  {name:<{col_pod}}  {cpu_m:>9}m  {mem_val:>11.0f}{mem_label}")
-    lines.append("```")
+    # Build search condition
+    safe_search = search.replace("'", "''")
+    search_cond = f" AND (u.username ILIKE '%{safe_search}%' OR d.name ILIKE '%{safe_search}%' OR d.status ILIKE '%{safe_search}%')" if search else ""
+    search_text = f" matching `{search}`" if search else ""
+    
+    # Construct the Postgres query
+    sql = (
+        f"SELECT '{namespace}-user-' || d.creator_id AS user_namespace, "
+        f"u.username, d.name AS workload_name, d.cpu, d.memory, d.status, d.created_at "
+        f"FROM {table_name} d "
+        f"LEFT JOIN users u ON u.namespace = '{namespace}-user-' || d.creator_id "
+        f"WHERE d.created_at >= NOW() - INTERVAL '{sql_interval}'{search_cond} "
+        f"ORDER BY d.{sort_col} DESC "
+        f"LIMIT {limit}"
+    )
+    
+    # Execute the query
+    out = exec_db_query(namespace=namespace, sql=sql, database="sense")
+    
+    # Error handling
+    if "[ERROR]" in out or "(Query returned no rows.)" in out:
+        return out
+        
+    # Parse the output to generate the graph JSON and a clean Markdown table
+    lines = out.splitlines()
+    data_start = 0
+    for i, line in enumerate(lines):
+        if line.startswith("user_namespace|"):
+            data_start = i + 2
+            break
 
-    now_ts   = int(_time.time())
-    sk_label = "CPU Req(m)" if sort_by.lower() in ("cpu", "cpu_m") else f"Mem Req({mem_label})"
-    series_out = [
-        {"label":  f"{ns_v}/{name}" if ns_v != "-" else name,
-         "values": [[now_ts, float(cpu_m if sort_by.lower() in ("cpu","cpu_m") else mem_val)]]}
-        for ns_v, name, cpu_m, mem_val in rows
+    parsed_rows = []
+    if data_start > 0:
+        for line in lines[data_start:]:
+            if not line.strip(): continue
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 7:
+                u_ns, uname, wname, cpu_str, mem_str, status, ts_str = parts[:7]
+                try:
+                    cpu_val = float(cpu_str)
+                    mem_val = float(mem_str)
+                except ValueError:
+                    continue
+                    
+                # Clean timestamp (e.g., '2026-03-25 07:51:23.080983+00' -> '2026-03-25 07:51:23')
+                clean_ts = ts_str.split(".")[0].split("+")[0].strip()
+                parsed_rows.append((u_ns, uname, wname, cpu_val, mem_val, status, clean_ts))
+
+    if not parsed_rows:
+        return f"No records found in `{table_name}`{search_text} over the last {duration}."
+
+    # 1. Build the clean, terminal-style Markdown Table
+    col_ns = max(len("NAMESPACE"), max((len(r[0]) for r in parsed_rows), default=0))
+    col_user = max(len("USER"), max((len(r[1]) for r in parsed_rows), default=0))
+    col_wl = max(len("WORKLOAD"), max((len(r[2]) for r in parsed_rows), default=0))
+
+    hdr_row = f"{'NAMESPACE':<{col_ns}}  {'USER':<{col_user}}  {'WORKLOAD':<{col_wl}}  {'CPU':>6}  {'MEMORY':>8}  {'STATUS':<10}  {'CREATED AT'}"
+    sep = "-" * len(hdr_row)
+    
+    md_lines = [
+        f"Top {len(parsed_rows)} `{table_name}` by {sort_col.upper()} requests in `{namespace}`{search_text} — last {duration}.",
+        "```",
+        hdr_row,
+        sep
     ]
-    graph_json = _json.dumps(
-        {"title": f"{direction.title()} {len(rows)} pods — {sk_label} live",
-         "unit":  "m" if sort_by.lower() in ("cpu","cpu_m") else mem_label,
-         "duration": "live", "series": series_out},
-        separators=(",", ":"))
-
-    return "\n".join(lines) + f"\n§GRAPH§{graph_json}§GRAPH§"
-
-
-def _get_top_pod_requests_prometheus(namespace: str, limit: int, sort_by: str,
-                              ascending: bool, search: str, duration: str,
-                              user_timezone: str, step: str = "10s", memory_unit: str = "Mi") -> str:
-    import json as _json
-    import urllib.parse
-    from kubernetes.stream import stream as _k8s_stream
-
-    both_mode      = sort_by.lower() == "both"
-    sort_key_label = "CPU" if sort_by.lower() in ("cpu", "cpu_m") else ("both" if both_mode else "memory")
-    direction      = "lowest" if ascending else "top"
-    scope          = f"namespace `{namespace}`" if namespace != "all" else "all namespaces"
-    filter_note    = f" matching `{search}`" if search else ""
-
-    p = _parse_prom_duration(duration, user_timezone, max_days=90)
-    duration, step, rate_window = p["duration"], p["step"], p["rate_window"]
-    start_ts, end_ts, from_str, to_str = p["start_ts"], p["end_ts"], p["from_str"], p["to_str"]
-
-    ns_filter   = f',namespace="{namespace}"' if namespace not in ("all", "") else ""
-    base_filter_cpu = f'resource="cpu",container!="",container!="POD"{ns_filter}'
-    base_filter_mem = f'resource="memory",container!="",container!="POD"{ns_filter}'
-
-    mem_divisor = 1073741824 if memory_unit.lower() in ("gi", "g", "gb") else 1048576
-    mem_unit_label = "Gi" if memory_unit.lower() in ("gi", "g", "gb") else "Mi"
-
-    # Query kube-state-metrics for pod requests
-    cpu_promql = f'sum by (pod, namespace) (max_over_time(kube_pod_container_resource_requests{{{base_filter_cpu}}}[{rate_window}])) * 1000'
-    mem_promql = f'sum by (pod, namespace) (max_over_time(kube_pod_container_resource_requests{{{base_filter_mem}}}[{rate_window}])) / {mem_divisor}'
-
-    prom_pod, prom_ns, prom_container = _find_prometheus_pod()
-    if not prom_pod:
-        return "No running Prometheus server pod found."
-
-    def _exec(cmd, large: bool = False):
-        try:
-            if large:
-                ws = _k8s_stream(_core.connect_get_namespaced_pod_exec, prom_pod, prom_ns, command=["/bin/sh", "-c", cmd], container=prom_container, stderr=False, stdin=False, stdout=True, tty=False, _preload_content=False)
-                chunks = []
-                while ws.is_open():
-                    ws.update(timeout=60)
-                    if ws.peek_stdout(): chunks.append(ws.read_stdout())
-                ws.close()
-                resp = "".join(chunks)
-            else:
-                resp = _k8s_stream(_core.connect_get_namespaced_pod_exec, prom_pod, prom_ns, command=["/bin/sh", "-c", cmd], container=prom_container, stderr=False, stdin=False, stdout=True, tty=False, _preload_content=True)
-            if isinstance(resp, bytes): resp = resp.decode("utf-8", errors="replace")
-            return resp.strip() if isinstance(resp, str) else str(resp).strip()
-        except Exception as exc:
-            return f"[exec error: {exc}]"
-
-    base_url = "http://localhost:9090"
-    probe    = _exec(f"curl -s -o /dev/null -w '%{{http_code}}' '{base_url}/prometheus/api/v1/query?query=up'")
-    api_base = f"{base_url}/prometheus/api/v1" if probe.strip() == "200" else f"{base_url}/api/v1"
-
-    def _run_query(promql: str):
-        enc = urllib.parse.quote(promql, safe="")
-        url = f"{api_base}/query_range?query={enc}&start={start_ts}&end={end_ts}&step={step}"
-        raw = _exec(f"curl -s --max-time 60 '{url}'", large=True)
-        if not raw: return None, "Prometheus returned an empty response."
-        try: data = _json.loads(raw)
-        except Exception: return None, f"Prometheus returned non-JSON: {raw[:300]}"
-        if data.get("status") != "success": return None, f"Prometheus query failed: {data.get('error', data)}"
-        return data.get("data", {}).get("result", []), None
-
-    def _peak_and_lowest(r):
-        vals = [float(v[1]) for v in r.get("values", []) if str(v[1]) not in ("NaN", "Inf", "-Inf", "+Inf")]
-        if not vals: return 0.0, 0.0
-        return max(vals), min(vals)
-
-    def _rank(results, lim):
-        ranked = []
-        for r in results:
-            ml    = r.get("metric", {})
-            ns_v  = ml.get("namespace", "-")
-            pod_v = ml.get("pod", ml.get("pod_name", "?"))
-            if search and search.lower() not in pod_v.lower() and search.lower() not in ns_v.lower(): continue
-            peak, lowest = _peak_and_lowest(r)
-            if peak == 0.0 and lowest == 0.0: continue
-            ranked.append((ns_v, pod_v, peak, lowest, r.get("values", [])))
-        ranked.sort(key=lambda x: x[2], reverse=not ascending)
-        return ranked[:max(1, lim)]
-
-    def _make_series(ranked):
-        return [{"label": f"{ns_v}/{pod_v}" if ns_v != "-" else pod_v, "values": [[float(ts), float(v)] for ts, v in vals if str(v) not in ("NaN", "Inf", "-Inf", "+Inf")]} for ns_v, pod_v, _, _, vals in ranked]
-
-    if both_mode:
-        cpu_results, cpu_err = _run_query(cpu_promql)
-        if cpu_err: return cpu_err
-        mem_results, mem_err = _run_query(mem_promql)
-        if mem_err: return mem_err
-
-        cpu_ranked = _rank(cpu_results or [], limit)
-        mem_ranked = _rank(mem_results or [], limit)
-
-        if not cpu_ranked and not mem_ranked: return f"No Prometheus data for requests over the last {duration}."
-
-        ns_set = set()
-        if cpu_ranked: ns_set.update(r[0] for r in cpu_ranked if r[0] != "-")
-        if mem_ranked: ns_set.update(r[0] for r in mem_ranked if r[0] != "-")
-        if ns_set:
-            ns_map = _enrich_cml_usernames(ns_set)
-            cpu_ranked = [(ns_map.get(r[0], r[0]), r[1], r[2], r[3], r[4]) for r in cpu_ranked]
-            mem_ranked = [(ns_map.get(r[0], r[0]), r[1], r[2], r[3], r[4]) for r in mem_ranked]
-
-        lines = []
-        if cpu_ranked:
-            cpu_rows = [(ns_v, pod_v, peak_v, low_v) for ns_v, pod_v, peak_v, low_v, _ in cpu_ranked]
-            col_ns  = max(len("NAMESPACE"), max(len(r[0]) for r in cpu_rows))
-            col_pod = max(len("POD"),       max(len(r[1]) for r in cpu_rows))
-            lines += [
-                f"{direction.title()} {len(cpu_rows)} pods by peak CPU request in {scope}{filter_note} — last {duration} ({from_str}–{to_str}, {step} interval).",
-                "```",
-                f"{'NAMESPACE':<{col_ns}}  {'POD':<{col_pod}}  {'PEAK REQ(m)':>12}  {'LOWEST REQ(m)':>14}",
-                "-" * (col_ns + col_pod + 30),
-            ]
-            for ns_v, pod_v, peak_v, low_v in cpu_rows: lines.append(f"{ns_v:<{col_ns}}  {pod_v:<{col_pod}}  {peak_v:>11.1f}m  {low_v:>13.1f}m")
-            if not mem_ranked: lines += ["", "  ⚠️ Note: Historical queries are safely capped at 90d to protect Prometheus."]
-            lines.append("```")
-
-        if mem_ranked:
-            mem_rows = [(ns_v, pod_v, peak_v, low_v) for ns_v, pod_v, peak_v, low_v, _ in mem_ranked]
-            col_ns  = max(len("NAMESPACE"), max(len(r[0]) for r in mem_rows))
-            col_pod = max(len("POD"),       max(len(r[1]) for r in mem_rows))
-            lines += [
-                f"{direction.title()} {len(mem_rows)} pods by peak memory request in {scope}{filter_note} — last {duration} ({from_str}–{to_str}, {step} interval).",
-                "```",
-                f"{'NAMESPACE':<{col_ns}}  {'POD':<{col_pod}}  {'PEAK REQ('+mem_unit_label+')':>14}  {'LOWEST REQ('+mem_unit_label+')':>16}",
-                "-" * (col_ns + col_pod + 34),
-            ]
-            for ns_v, pod_v, peak_v, low_v in mem_rows: lines.append(f"{ns_v:<{col_ns}}  {pod_v:<{col_pod}}  {peak_v:>12.1f}{mem_unit_label}  {low_v:>14.1f}{mem_unit_label}")
-            lines += ["", "  ⚠️ Note: Historical queries are safely capped at 90d to protect Prometheus.", "```"]
-
-        graphs = []
-        if cpu_ranked: graphs.append({"title": f"Top {len(cpu_ranked)} pods — CPU Requests ({from_str}–{to_str})", "unit": "m", "duration": duration, "series": _make_series(cpu_ranked)})
-        if mem_ranked: graphs.append({"title": f"Top {len(mem_ranked)} pods — Memory Requests ({from_str}–{to_str})", "unit": mem_unit_label, "duration": duration, "series": _make_series(mem_ranked)})
-        return "\n".join(lines) + "".join(f"\n§GRAPH§{_json.dumps(g, separators=(',', ':'))}§GRAPH§" for g in graphs)
-
-    promql = cpu_promql if sort_key_label == "CPU" else mem_promql
-    results, err = _run_query(promql)
-    if err: return err
-    if not results: return f"No Prometheus data for metric '{sort_key_label}' requests over the last {duration}."
-
-    ranked = _rank(results, limit)
-    if not ranked: return (f"No Prometheus data matching `{search}` over the last {duration}." if search else f"No Prometheus data over the last {duration}.")
-
-    ns_set = {r[0] for r in ranked if r[0] != "-"}
-    if ns_set:
-        ns_map = _enrich_cml_usernames(ns_set)
-        ranked = [(ns_map.get(r[0], r[0]), r[1], r[2], r[3], r[4]) for r in ranked]
-
-    rows = [(ns_v, pod_v, peak_v, low_v) for ns_v, pod_v, peak_v, low_v, _ in ranked]
-    unit = "m" if sort_key_label == "CPU" else mem_unit_label
-
-    header  = (f"{direction.title()} {len(rows)} pods by peak {sort_key_label} requests "
-               f"in {scope}{filter_note} — last {duration} ({from_str}–{to_str}, {step} interval).")
-    col_ns  = max(len("NAMESPACE"), max(len(r[0]) for r in rows))
-    col_pod = max(len("POD"),       max(len(r[1]) for r in rows))
-    col_peak = f"PEAK REQ({unit})"
-    col_low  = f"LOWEST REQ({unit})"
     
-    hdr_row = f"{'NAMESPACE':<{col_ns}}  {'POD':<{col_pod}}  {col_peak:>15}  {col_low:>16}"
-    sep     = "-" * len(hdr_row)
-    lines   = [header, "```", hdr_row, sep]
-    for ns_v, pod_v, peak_v, low_v in rows: lines.append(f"{ns_v:<{col_ns}}  {pod_v:<{col_pod}}  {peak_v:>13.1f}{unit}  {low_v:>14.1f}{unit}")
-    lines += ["", "  ⚠️ Note: Historical queries are safely capped at 90d to protect Prometheus.", "```"]
+    # 2. Extract Data for Graph JSON (Grouped by User)
+    series_dict = {}
+    for r in parsed_rows:
+        u_ns, uname, wname, cpu_val, mem_val, status, clean_ts = r
+        
+        # Table Row
+        uname_display = uname if uname else "-"
+        md_lines.append(f"{u_ns:<{col_ns}}  {uname_display:<{col_user}}  {wname:<{col_wl}}  {cpu_val:>6g}  {mem_val:>8g}  {status:<10}  {clean_ts}")
+        
+        # Graph Math
+        try:
+            dt = datetime.datetime.strptime(clean_ts, "%Y-%m-%d %H:%M:%S")
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+            ts = int(dt.timestamp())
+        except Exception:
+            ts = int(time.time())
 
-    series_out = _make_series(ranked)
-    title      = f"{direction.title()} {len(rows)} pods — {sort_key_label} Requests ({from_str}–{to_str})"
-    graph_json = _json.dumps({"title": title, "unit": unit, "duration": duration, "series": series_out}, separators=(",", ":"))
-    return "\n".join(lines) + f"\n§GRAPH§{graph_json}§GRAPH§"
+        val = cpu_val if sort_col == "cpu" else mem_val
+        label = uname if uname else u_ns
+        
+        if label not in series_dict:
+            series_dict[label] = []
+        series_dict[label].append([ts, val])
+
+    md_lines.append("```")
+
+    # 3. Sort chronologically and compile Graph JSON
+    series_out = []
+    for label, points in series_dict.items():
+        points.sort(key=lambda x: x[0])  # Sort by timestamp
+        series_out.append({"label": label, "values": points})
+
+    unit = "cores" if sort_col == "cpu" else "GB"
+    graph_json = json.dumps({
+        "title": f"Top {len(parsed_rows)} {table_name.title()} — {sort_col.upper()} Requests",
+        "unit": unit,
+        "duration": duration,
+        "series": series_out
+    }, separators=(",", ":"))
+
+    # Append graph block
+    md_lines.append(f"\n§GRAPH§{graph_json}§GRAPH§")
+
+    return "\n".join(md_lines)
 
 def get_top_pods(namespace: str = "all", limit: int = 5, sort_by: str = "cpu",
                  ascending: bool = False, search: str = "", duration: str = "",
