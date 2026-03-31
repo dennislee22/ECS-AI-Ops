@@ -9,7 +9,7 @@ import os
 logger = logging.getLogger(__name__)
 
 _ALWAYS_INCLUDE = {
-    "find_resource",
+   # "find_resource",
     "get_pod_status",
     "exec_db_query",
 }
