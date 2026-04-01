@@ -173,6 +173,9 @@ K8S_TOOL_METADATA: dict = {
         "fn":               get_pods_using_resource,
         "embed_keywords":   "reverse lookup which pod uses attached mounted secret configmap pvc claim reference volume bound",
         "description": (
+            "🛑 CRITICAL DIRECTION RULE: This tool answers 'Which pods are using Secret/ConfigMap/PVC X?'. "
+            "DO NOT USE THIS TOOL if the user asks the reverse (e.g., 'What secrets/configmaps is Pod Y using?'). "
+            "If the user provides a POD NAME and wants to know what resources it mounts, call `describe_pod` instead! 🛑\n\n"
             "Reverse lookup: Find all pods that mount, claim, or reference a specific Secret, ConfigMap, or PVC. "
             "Use this tool when the user asks 'which pod uses secret X', 'what pods are associated with configmap Y', "
             "or 'find pods attached to PVC Z'. "
@@ -186,7 +189,10 @@ K8S_TOOL_METADATA: dict = {
             },
             "resource_name": {
                 "type": "string", 
-                "description": "The exact name of the Secret, ConfigMap, or PVC."
+                "description": (
+                    "CRITICAL: The exact name of the Secret, ConfigMap, or PVC. "
+                    "NEVER put a Pod name in this field! If the user gave you a Pod name to inspect, you are using the wrong tool."
+                )
             },
             "namespace": _P_NS,
         },
