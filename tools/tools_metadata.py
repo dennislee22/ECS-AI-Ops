@@ -169,24 +169,6 @@ K8S_TOOL_METADATA: dict = {
         },
     },
 
-    "get_pods_on_node": {
-        "fn":               get_pods_on_node,
-        "embed_keywords":   "pods on node hosted running schedule assigned placed specific server machine",
-        "description": (
-            "List all pods currently hosted on a specific Kubernetes node. "
-            "Returns a Markdown table showing namespace, pod name, phase, and readiness. "
-            "Use for queries like: 'which pod is hosted on node X', 'what is running on ecs-w-01', "
-            "'show pods on node Y'. "
-            "Do NOT use get_node_info or get_pod_status for this — use this dedicated tool when a node name is provided. "
-        ) + _VERBATIM,
-        "parameters":  {
-            "node_name": {
-                "type":        "string",
-                "description": "The exact name of the Kubernetes node (e.g., 'ecs-w-01')."
-            },
-        },
-    },
-
     "get_pods_using_resource": {
         "fn":               get_pods_using_resource,
         "embed_keywords":   "reverse lookup which pod uses attached mounted secret configmap pvc claim reference volume bound",
@@ -231,6 +213,7 @@ K8S_TOOL_METADATA: dict = {
         "fn":               get_pod_status,
         "embed_keywords":   "pod status list pods all running pending failed unknown crashloopbackoff imagepullbackoff oomkilled stuck broken unhealthy issues",
         "description": (
+            "🛑 CRITICAL POD LISTING RULE: If the user asks to 'list pods', 'show pods', or 'get pods' in a specific namespace (e.g., 'in cdp-keda', 'in cdp-keda namespace', 'in cdp-keda ns'), YOU MUST USE THIS TOOL! Do NOT use `find_resource` or `get_pods_on_node`! 🛑\n\n"
             "List Kubernetes pods with their phase, readiness, restart count, and conditions. "
             "This is the PRIMARY tool for listing pods and checking pod health. "
             "Use this tool for queries like: "
@@ -261,6 +244,66 @@ K8S_TOOL_METADATA: dict = {
                     "'stuck', 'broken', 'down', 'pending', 'unknown'. "
                     "For a specific phase pass it directly: 'Running', 'Pending', 'Failed', 'Unknown'. "
                     "Omit entirely to show all pods regardless of phase."
+                ),
+            },
+        },
+    },
+
+    "get_pods_on_node": {
+        "fn":               get_pods_on_node,
+        "embed_keywords":   "pods on node hosted running schedule assigned placed specific server machine",
+        "description": (
+            "🛑 CRITICAL NODE RULE: DO NOT USE THIS TOOL IF THE USER ASKS FOR PODS IN A 'NAMESPACE' OR 'NS'! "
+            "This tool is ONLY for listing pods running on a specific physical/virtual Kubernetes 'NODE' or 'SERVER' (e.g., 'ecs-w-01'). "
+            "If they provide a namespace, use `get_pod_status` instead! 🛑\n\n"
+            "List all pods currently hosted on a specific Kubernetes node. "
+            "Returns a Markdown table showing namespace, pod name, phase, and readiness. "
+            "Use for queries like: 'which pod is hosted on node X', 'what is running on ecs-w-01', "
+            "'show pods on node Y'. "
+            "Do NOT use get_node_info or get_pod_status for this — use this dedicated tool when a physical node name is provided. "
+        ) + _VERBATIM,
+        "parameters":  {
+            "node_name": {
+                "type":        "string",
+                "description": (
+                    "CRITICAL: The exact name of the physical/virtual Kubernetes node (e.g., 'ecs-w-01'). "
+                    "NEVER put a namespace name (like 'cdp-keda') in this field!"
+                )
+            },
+        },
+    },
+
+    "get_ingress": {
+        "fn":               get_ingress,
+        "embed_keywords":   "ingress rules hostname fqdn url port 443 80 load balancer https tls domain web traffic route",
+        "description": (
+            "List Ingress rules, hostnames, ports, and load balancer IPs/addresses. "
+            "Can find which ingress and namespace serve a specific hostname (FQDN) or port. "
+            "ALWAYS search ALL namespaces by default. "
+            "Use cases: "
+            "'which namespace has ingress port 443' → get_ingress(port=443) "
+            "'which namespace serves hostname X' → get_ingress(name='X.example.com') "
+            "'list all ingresses in cdp namespace' → get_ingress(namespace='cdp') "
+            "'list all cluster ingresses' → get_ingress(namespace='all')"
+        ),
+        "parameters":  {
+            "namespace": _P_NS,
+            "name":      {
+                "type":    "string",
+                "default": "",
+                "description": (
+                    "Ingress name OR hostname/FQDN. "
+                    "If it contains dots it is treated as a hostname and ALL namespaces are searched. "
+                    "Example: 'console-cdp.apps.dlee155.cldr.example'"
+                ),
+            },
+            "port":      {
+                "type":    "integer",
+                "default": 0,
+                "description": (
+                    "Filter ingresses by port number. "
+                    "Use port=443 to find all ingresses exposing HTTPS/TLS. "
+                    "Use port=80 to find HTTP-only ingresses."
                 ),
             },
         },
@@ -765,42 +808,6 @@ K8S_TOOL_METADATA: dict = {
             "namespace": _P_NS,
             "search":    {**_P_SEARCH, "description": "Optional keyword to filter services by name (partial match)."},
             "port":      {"type": "integer", "default": 0, "description": "Optional port number to filter services by. Returns only services exposing this port."},
-        },
-    },
-
-    "get_ingress": {
-        "fn":               get_ingress,
-        "embed_keywords":   "ingress rules hostname fqdn url port 443 80 load balancer https tls domain web traffic route",
-        "description": (
-            "List Ingress rules, hostnames, ports, and load balancer IPs/addresses. "
-            "Can find which ingress and namespace serve a specific hostname (FQDN) or port. "
-            "ALWAYS search ALL namespaces by default. "
-            "Use cases: "
-            "'which namespace has ingress port 443' → get_ingress(port=443) "
-            "'which namespace serves hostname X' → get_ingress(name='X.example.com') "
-            "'list all ingresses in cdp namespace' → get_ingress(namespace='cdp') "
-            "'list all cluster ingresses' → get_ingress(namespace='all')"
-        ),
-        "parameters":  {
-            "namespace": _P_NS,
-            "name":      {
-                "type":    "string",
-                "default": "",
-                "description": (
-                    "Ingress name OR hostname/FQDN. "
-                    "If it contains dots it is treated as a hostname and ALL namespaces are searched. "
-                    "Example: 'console-cdp.apps.dlee155.cldr.example'"
-                ),
-            },
-            "port":      {
-                "type":    "integer",
-                "default": 0,
-                "description": (
-                    "Filter ingresses by port number. "
-                    "Use port=443 to find all ingresses exposing HTTPS/TLS. "
-                    "Use port=80 to find HTTP-only ingresses."
-                ),
-            },
         },
     },
 
