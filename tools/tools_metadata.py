@@ -1149,11 +1149,12 @@ K8S_TOOL_METADATA: dict = {
             "NEVER truncate the input string in the SQL WHERE clause — use it in full. "
             "NEVER use SELECT namespace when the input contains '-user-'. "
             "NEVER use SELECT username when the input has no '-user-'. "
-            "USER METRICS CHAIN: If the query asks for resource usage for a specific user (e.g. 'is user Dennis hogging resources'): "
-            "YOU MUST CALL `exec_db_query` FIRST. DO NOT SKIP THIS STEP. DO NOT CALL `get_top_pods` YET. "
+            "USER METRICS CHAIN (ACTIVE USAGE ONLY): If the query asks for active resource USAGE for a specific user (e.g. 'is user Dennis hogging resources'): "
+            "YOU MUST CALL `exec_db_query` FIRST to get the namespace. DO NOT SKIP THIS STEP. DO NOT CALL `get_top_pods` YET. "
             "You must execute this exact SQL: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>') "
             "WAIT for the database to return the namespace. ONLY AFTER you receive the database result may you call `get_top_pods` using the returned namespace. "
             "NEVER pass the username into get_top_pods search. "
+            "CRITICAL: If the user asks for resource REQUESTS or LIMITS, DO NOT use this chain. Call `get_workspace_top_requests` instead! "
             "WORKFLOW EXAMPLE: To access 'db-0' in namespace 'cmlwb1' and find tables in database 'sense': "
             "exec_db_query(namespace='cmlwb1', pod_name='db-0', container='db', database='sense', "
             "sql=\"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public'\") "
@@ -1200,7 +1201,7 @@ K8S_TOOL_METADATA: dict = {
 
     "get_workspace_top_requests": {
         "fn":               get_workspace_top_requests,
-        "embed_keywords":   "top pods requests allocation reserved metrics workbench workspace user cpu memory ram graph highest lowest historical trend",
+        "embed_keywords":   "top pods request requests allocation reserved metrics workbench workspace user cpu memory ram graph highest lowest historical trend",
         "description": (
             "Query the workspace's Postgres 'sense' database to find the top historical CPU and memory requests for workloads (dashboards) over a specific time period. "
             "Use this when the user explicitly asks for top CPU or memory 'requests' or 'limits' over the past X days/hours for a workspace or a specific user. "
