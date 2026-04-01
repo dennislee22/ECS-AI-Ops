@@ -1226,8 +1226,9 @@ K8S_TOOL_METADATA: dict = {
                 "default":     "cpu",
                 "description": (
                     "CRITICAL: The metric to sort by. Default is 'cpu'. "
-                    "IF THE USER ASKS FOR 'RAM', 'MEM', OR 'MEMORY', YOU MUST EXPLICITLY SET THIS TO 'memory'! "
-                    "Extract from user question: 'cpu' → 'cpu', 'memory'/'ram' → 'memory', 'cpu and memory'/'both' → 'both'."
+                    "IF THE USER ASKS FOR 'RAM', 'MEM', OR 'MEMORY', YOU MUST SET THIS TO 'memory'. "
+                    "IF THE USER ASKS FOR 'RESOURCES' (e.g. 'resources usage'), YOU MUST SET THIS TO 'both'. "
+                    "Extract from user question: 'cpu' → 'cpu', 'memory'/'ram' → 'memory', 'resources'/'cpu and memory'/'both' → 'both'."
                 ),
             },
             "ascending": {
@@ -1254,7 +1255,7 @@ K8S_TOOL_METADATA: dict = {
             },
         },
     },
-
+    
     "get_top_nodes": {
         "fn":               get_top_nodes,
         "embed_keywords":   "top nodes metrics cpu memory ram disk io read write throughput usage graph highest lowest live historical data trend performance",
