@@ -675,6 +675,31 @@ def describe_pod(pod_name: str = "", namespace: str = "all", search: str | None 
             lines.append(f"{indent}Ready:        {status.ready}")
             lines.append(f"{indent}Restart Count: {status.restart_count}")
 
+        def _append_envs(container):
+            env_list = []
+            for e in container.env or []:
+                if e.value is not None:
+                    env_list.append(f"      {e.name}: {e.value}")
+                elif e.value_from:
+                    vf = e.value_from
+                    if vf.secret_key_ref:
+                        env_list.append(f"      {e.name}: <key '{vf.secret_key_ref.key}' in Secret '{vf.secret_key_ref.name}'>")
+                    elif vf.config_map_key_ref:
+                        env_list.append(f"      {e.name}: <key '{vf.config_map_key_ref.key}' in ConfigMap '{vf.config_map_key_ref.name}'>")
+                    elif vf.field_ref:
+                        env_list.append(f"      {e.name}: <field '{vf.field_ref.field_path}'>")
+                    else:
+                        env_list.append(f"      {e.name}: <unknown value_from>")
+            for ef in container.env_from or []:
+                pfx = ef.prefix or ""
+                if getattr(ef, 'secret_ref', None):
+                    env_list.append(f"      <all keys in Secret '{ef.secret_ref.name}'{f' (prefix: {pfx})' if pfx else ''}>")
+                elif getattr(ef, 'config_map_ref', None):
+                    env_list.append(f"      <all keys in ConfigMap '{ef.config_map_ref.name}'{f' (prefix: {pfx})' if pfx else ''}>")
+            if env_list:
+                lines.append("    Environment:")
+                lines.extend(env_list)
+
         if pod.spec.init_containers:
             lines.append("Init Containers:")
             for c in pod.spec.init_containers:
@@ -682,6 +707,8 @@ def describe_pod(pod_name: str = "", namespace: str = "all", search: str | None 
                           f"    Resources:    limits={c.resources.limits}, requests={c.resources.requests}",
                           f"    Mounts:       " + ", ".join(m.mount_path for m in c.volume_mounts or [])]
                 _cstate(next((s for s in pod.status.init_container_statuses or [] if s.name == c.name), None))
+                _append_envs(c)
+                
         if pod.spec.containers:
             lines.append("Containers:")
             for c in pod.spec.containers:
@@ -690,6 +717,8 @@ def describe_pod(pod_name: str = "", namespace: str = "all", search: str | None 
                 lines += [f"    Requests:     {c.resources.requests or {}}",
                           f"    Limits:       {c.resources.limits or {}}",
                           f"    Mounts:       " + ", ".join(m.mount_path for m in c.volume_mounts or [])]
+                _append_envs(c)
+
         if pod.status.conditions:
             lines.append("Conditions:")
             for cond in pod.status.conditions:
