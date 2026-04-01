@@ -1118,24 +1118,23 @@ K8S_TOOL_METADATA: dict = {
         "fn":               exec_db_query,
         "embed_keywords":   "database db usage sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup workbench resources metrics consume",
         "description": (
-            "CRITICAL GUARDRAIL: If user asks about REQUEST, limits, sessions FOR A USER, YOU MUST NEVER CALL THIS TOOL! "
-            "ABORT AND CALL `get_cml_session_request` INSTEAD! This tool is ONLY for active usage or general SQL queries. "
+            "🛑 CRITICAL - USAGE VS REQUESTS 🛑\n"
+            "- IF USER ASKS ABOUT 'REQUESTS', 'LIMITS', 'SESSIONS': DO NOT CALL THIS TOOL! Abort and call `get_cml_session_request` instead!\n"
+            "- IF USER ASKS ABOUT ACTIVE 'USAGE' FOR A SPECIFIC USER (e.g. 'RAM usage for Dennis'): YOU MUST CALL THIS TOOL FIRST to find their namespace.\n"
+            "  → Call exec_db_query with namespace='cmlwb1' (or whatever the main workbench namespace is). NEVER pass the user's namespace (like 'cmlwb1-user-1') to this tool!\n"
+            "  → Execute this exact SQL: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')\n"
+            "  → WAIT for the database to return the namespace (e.g. 'cmlwb1-user-1'), then call `get_top_pods` using that exact namespace.\n\n"
             "Execute a read-only SQL query inside a running database pod in a Kubernetes namespace. "
             "For multi-container pods, set container='db' to target the correct database container. "
             "Credentials (username, password, database) are automatically discovered from the pod's environment. "
-            "Use for querying database contents, user accounts, table data, or schema inspection. "
             "READ-ONLY ENFORCEMENT: Only SELECT, SHOW, DESCRIBE, EXPLAIN are allowed. "
             "MANDATORY SCHEMA INSTRUCTION: If PostgreSQL, use `DESCRIBE <table_name>` to view schemas. "
-            "If the user asks for active resource USAGE (e.g., 'RAM or memory usage for user Manas', 'CPU usage for user Manas'): "
-            "→ Step 1: Call exec_db_query to get their namespace: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>') "
-            "→ Step 2: Wait for the result, then call `get_top_pods` using that namespace. "
             "CUSTOM RULE — USER/NAMESPACE RESOLUTION: "
             "IF the input contains '-user-' (e.g. 'cmlwb1-user-1'): "
             "→ exec_db_query(namespace='cmlwb1', sql=\"SELECT username FROM users WHERE LOWER(namespace)=LOWER('cmlwb1-user-1')\") "
             "IF the input has NO '-user-' (e.g. 'Dennis'): "
             "→ exec_db_query(namespace='cmlwb1', sql=\"SELECT namespace FROM users WHERE LOWER(username)=LOWER('dennis')\") "
             "NEVER truncate the input string in the SQL WHERE clause — use it in full. "
-            "RESULT INTERPRETATION: 'host' is a connection restriction, not a password. "
             "MANDATORY DIALECT RETRY: If the error mentions 'does not exist', 'relation', or 'unknown table', "
             "retry immediately with the other SQL dialect (PostgreSQL vs MySQL)."
         ),
@@ -1144,20 +1143,15 @@ K8S_TOOL_METADATA: dict = {
                 "type":        "string",
                 "description": (
                     "REQUIRED. Kubernetes namespace where the database pod runs. "
-                    "NEVER omit this argument. "
-                    "For user namespace resolution, this is the workbench namespace (e.g. 'cmlwb1'), "
-                    "NOT the user's personal namespace — the SQL query will return that."
+                    "CRITICAL: For user namespace resolution, this MUST be the workbench namespace (e.g. 'cmlwb1'). "
+                    "NEVER pass the user's personal namespace (e.g. 'cmlwb1-user-1') here!"
                 ),
             },
             "sql":       {
                 "type":        "string",
-                "description": (
-                    "Read-only SQL query to execute. "
-                    "Examples: \"SHOW TABLES\", \"SELECT user, host FROM mysql.user\", "
-                    "\"SELECT usename FROM pg_catalog.pg_user\", \"DESCRIBE my_table\""
-                ),
+                "description": "Read-only SQL query to execute.",
             },
-            "pod_name":  {"type": "string", "default": "", "description": "Optional: specific DB pod name (e.g., 'db-0')."},
+            "pod_name":  {"type": "string", "default": "", "description": "Optional: specific DB pod name."},
             "database":  {"type": "string", "default": "", "description": "Optional: database/schema name."},
             "container": {"type": "string", "default": "", "description": "Optional: container name inside the pod."},
         },
@@ -1165,12 +1159,14 @@ K8S_TOOL_METADATA: dict = {
 
     "get_cml_session_request": {
         "fn":               get_cml_session_request,
-        "embed_keywords":   "session pods request allocation workbench workspace user cpu memory ram graph highest lowest historical trend",
+        "embed_keywords":   "session pods request limits allocation workbench workspace user cpu memory ram graph highest lowest historical trend",
         "description": (
-            "workbench is equivalent to workspace and vice versa. "
+            "🛑 CRITICAL: This tool is ONLY for resource REQUESTS, LIMITS, or SESSIONS. If the user asks for active USAGE, DO NOT USE THIS TOOL. Call `get_top_pods` instead! 🛑\n\n"
             "Query the workbench's Postgres 'sense' database to find the top historical CPU and memory requests for workloads (dashboards) over a specific time period. "
             "Use this when the user explicitly asks for top CPU or memory 'requests' or 'limits' over the past X days/hours for a workbench/workspace or a specific user. "
-            "This checks resource request recorded directly in the CML database tables, NOT active Prometheus usage. "
+            "This checks resource requests recorded directly in the CML database tables, NOT active Prometheus usage.\n\n"
+            "CRITICAL INTERNAL LOOKUP: This tool handles username resolution internally! Do NOT call exec_db_query first to find a user's namespace. "
+            "If a user is specified (e.g., 'user Dennis'), simply pass their name directly into the 'search' parameter."
         ),
         "parameters":  {
             "namespace": {
@@ -1195,7 +1191,7 @@ K8S_TOOL_METADATA: dict = {
             "search": {
                 "type": "string",
                 "default": "",
-                "description": "Optional keyword to filter by username, workload name, or status (e.g., 'Dennis', 'Running')."
+                "description": "Optional keyword to filter by username. E.g., if the user asks for 'Dennis', pass 'Dennis' here."
             },
         },
     },
@@ -1204,74 +1200,53 @@ K8S_TOOL_METADATA: dict = {
         "fn":               get_top_pods,
         "embed_keywords":   "top pods metrics workbench workbench user cpu memory ram usage usage graph highest lowest live historical data trend performance",
         "description": (
+            "🛑 CRITICAL: This tool is ONLY for active resource USAGE. If the user asks for resource REQUESTS, LIMITS, or SESSIONS, DO NOT USE THIS TOOL. Call `get_cml_session_request` instead! 🛑\n\n"
             "Show live or historical CPU and memory usage for pods, ranked highest or lowest. "
             "ALWAYS emits both a ranked table AND a time-series graph in the output. "
-            "When duration is empty: uses metrics-server for a live snapshot (instant, like kubectl top pods). "
-            "When duration is set: queries Prometheus for average usage over that period — "
-            "use this when the user mentions a time window OR asks for a graph/chart. "
-            "Use for queries like: "
-            "'top 10 pods by cpu', "
-            "'which pods use the most memory', "
-            "'show me cpu usage graph for top 3 pods', "
-            "'top pods for the past 1 hour', "
-            "'top 5 pods in cdp namespace', "
-            "'show cpu usage for grafana pods', "
-            "'lowest cpu pods', "
-            "'which pods use the least memory over the last 6 hours', "
-            "'show top 3 pods by cpu and memory'. "
-            "CRITICAL USER METRICS RULE: If the prompt asks for metrics for a specific user, REGARDLESS OF CAPITALIZATION (e.g. 'user dennis', 'user Dennis', 'user manas', 'for Dennis'), you MUST NOT call get_top_pods directly. "
-            "Step 1: Call `exec_db_query` with sql=\"SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')\" to find their namespace (this ensures case-insensitivity). "
-            "Step 2: Call `get_top_pods` using ONLY the exact namespace string returned from the database (e.g. 'cmlwb1-user-1'), leave `search` empty, "
+            "When duration is empty: uses metrics-server for a live snapshot. "
+            "When duration is set: queries Prometheus for average usage over that period.\n\n"
+            "CRITICAL USER METRICS RULE (USAGE ONLY): If the prompt asks for active USAGE metrics for a specific user (e.g. 'user dennis' or 'user manas'), YOU MUST NOT CALL THIS TOOL DIRECTLY. "
+            "Step 1: Call `exec_db_query` using the main workbench namespace (e.g. namespace='cmlwb1') and execute sql=\"SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')\". "
+            "Step 2: WAIT for the DB result. Call `get_top_pods` using ONLY the exact namespace string returned from the database (e.g. namespace='cmlwb1-user-1'). Leave `search` empty, "
             "and ALWAYS set `duration` (e.g. '1h' or the requested window) to fetch from Prometheus. "
-            "Do NOT use get_top_nodes for ranked pod lists — use this tool. "
-            "IMPORTANT: When the user asks for a graph or chart of top pods, "
-            "ALWAYS set duration (e.g. '1h') to get the time-series data needed for the graph. "
-            "When the user asks for BOTH cpu and memory, set sort_by='both' to get two independent "
-            "ranked lists and two graphs — one for top pods by CPU, one for top pods by memory."
+            "NEVER pass the username into the get_top_pods search field — use the namespace returned from the DB."
         ),
         "parameters":  {
             "namespace": _P_NS,
             "limit":     {
                 "type":        "integer",
                 "default":     10,
-                "description": "Number of pods to return. Extract from user question — 'top 5' → 5, 'top 3' → 3. Default 10.",
+                "description": "Number of pods to return. Default 10.",
             },
             "sort_by":   {
                 "type":        "string",
                 "default":     "cpu",
-                "description": (
-                    "Sort metric: 'cpu' (default), 'memory', or 'both'. "
-                    "Set 'both' when user asks for both CPU and memory together — "
-                    "e.g. 'top 3 pods by cpu and memory', 'show cpu and ram usage for top pods'. "
-                    "Extract from user question: 'cpu' → 'cpu', 'memory'/'ram' → 'memory', "
-                    "'cpu and memory'/'both' → 'both'."
-                ),
+                "description": "Sort metric: 'cpu' (default), 'memory', or 'both'. Extract from user question.",
             },
             "ascending": {
                 "type":        "boolean",
                 "default":     False,
-                "description": "When True, show lowest consumers first. Set True for: 'lowest pods', 'least cpu', 'bottom pods', 'minimum usage'.",
+                "description": "When True, show lowest consumers first.",
             },
-            "search":    {**_P_SEARCH, "description": "Optional pod name or namespace filter. CRITICAL: If you just ran a DB query to find a user's namespace, you MUST set search='' (empty string). Do NOT pass the username into this field."},
+            "search":    {**_P_SEARCH, "description": "Optional pod name or namespace filter. CRITICAL: If you just ran a DB query to find a user's namespace, you MUST set search='' (empty string)."},
             "duration": {
                 "type": "string",
                 "default": "1h",
-                "description": "Time window (e.g., '1h', '24h', '7d', '30d', '90d'). For months, use days (1 month = '30d', 3 months = '90d')."
+                "description": "Time window (e.g., '1h', '24h', '7d', '30d')."
             },
             "memory_unit": {
                 "type": "string",
                 "enum": ["Mi", "Gi"],
                 "default": "Mi",
-                "description": "The unit for memory metrics. Default is Mi. If the user asks for GB or Gi, set this to Gi."
+                "description": "The unit for memory metrics. Default is Mi."
             },
             "user_timezone": {
                 "type":        "string",
                 "default":     "UTC",
-                "description": "User's IANA timezone. Auto-injected from browser — do not set manually.",
+                "description": "User's IANA timezone. Auto-injected from browser.",
             },
         },
     },
-
     "get_top_nodes": {
         "fn":               get_top_nodes,
         "embed_keywords":   "top nodes metrics cpu memory ram disk io read write throughput usage graph highest lowest live historical data trend performance",
