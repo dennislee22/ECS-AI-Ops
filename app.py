@@ -589,7 +589,7 @@ def build_agent():
             if name == "get_secret_list":
                 args["decode"] = _decode_secrets_ctx.get()
 
-            if name in ("get_top_pods", "get_workspace_top_requests", "get_top_nodes", "get_ingress_traffic"):
+            if name in ("get_top_pods", "get_workbench_top_requests", "get_top_nodes", "get_ingress_traffic"):
                 args["user_timezone"] = _timezone_ctx.get()
 
             tools_called.append(name)

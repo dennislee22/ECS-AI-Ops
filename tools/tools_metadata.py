@@ -5,7 +5,7 @@ from tools.tools_k8s import (
     get_pvc_status, get_cluster_version, get_storage_classes, get_endpoints,
     get_node_capacity, get_persistent_volumes, get_service, get_ingress, describe_pv,
     get_configmap_list, get_secret_list, get_resource_quotas, get_limit_ranges,
-    get_serviceaccounts, get_cluster_role_bindings, get_namespace_status, get_workspace_top_requests,
+    get_serviceaccounts, get_cluster_role_bindings, get_namespace_status, get_workbench_top_requests,
     get_pod_tolerations, run_cluster_health, get_replicaset, get_crds, get_longhorn_node_status,
     get_namespace_resource_summary, get_pod_images, get_unhealthy_pods_detail,
     get_coredns_health, get_pv_usage, find_resource, get_pod_containers_resources, get_cronjob_status,
@@ -1116,7 +1116,7 @@ K8S_TOOL_METADATA: dict = {
 
     "exec_db_query": {
         "fn":               exec_db_query,
-        "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup workbench workspace resources metrics usage consume",
+        "embed_keywords":   "database db sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup workbench workbench resources metrics usage consume",
         "description": (
             "Execute a read-only SQL query inside a running database pod in a Kubernetes namespace. "
             "Supports MySQL, MariaDB, and PostgreSQL, auto-detected from the container image or name. "
@@ -1133,7 +1133,7 @@ K8S_TOOL_METADATA: dict = {
             "you MUST use the query `DESCRIBE <table_name>`. Do not use `SELECT *` to find table schemas. "
             "MANDATORY ARGUMENT RULE: `namespace` is ALWAYS required. NEVER call this tool without it. "
             "If you do not yet know the namespace, look it up first before calling this tool. "
-            "CRITICAL GUARDRAIL FOR REQUESTS/LIMITS: If the user asks about CPU or Memory REQUESTS or LIMITS for a user or workspace, DO NOT CALL THIS TOOL. Call `get_workspace_top_requests` instead, which handles user resolution automatically. "
+            "CRITICAL GUARDRAIL FOR REQUESTS/LIMITS: If the user asks about CPU or Memory REQUESTS or LIMITS for a user or workbench, DO NOT CALL THIS TOOL. Call `get_workbench_top_requests` instead, which handles user resolution automatically. "
             "CUSTOM RULE — USER/NAMESPACE RESOLUTION (ACTIVE USAGE ONLY): "
             "IF the input contains '-user-' (e.g. 'cmlwb1-user-1', 'cmlwb2-user-3'): "
             "→ SELECT username FROM users WHERE LOWER(namespace)=LOWER('cmlwb1-user-1') "
@@ -1199,19 +1199,19 @@ K8S_TOOL_METADATA: dict = {
         },
     },
 
-    "get_workspace_top_requests": {
-        "fn":               get_workspace_top_requests,
-        "embed_keywords":   "top pods request requests allocation reserved metrics workbench workspace user cpu memory ram graph highest lowest historical trend",
+    "get_workbench_top_requests": {
+        "fn":               get_workbench_top_requests,
+        "embed_keywords":   "top pods request requests allocation reserved metrics workbench workbench user cpu memory ram graph highest lowest historical trend",
         "description": (
-            "Query the workspace's Postgres 'sense' database to find the top historical CPU and memory requests for workloads (dashboards) over a specific time period. "
-            "Use this when the user explicitly asks for top CPU or memory 'requests' or 'limits' over the past X days/hours for a workspace or a specific user. "
+            "Query the workbench's Postgres 'sense' database to find the top historical CPU and memory requests for workloads (dashboards) over a specific time period. "
+            "Use this when the user explicitly asks for top CPU or memory 'requests' or 'limits' over the past X days/hours for a workbench or a specific user. "
             "This checks resource allocation recorded directly in the CML database tables, NOT active Prometheus usage. "
-            "Because this queries a workspace database, a specific workspace namespace MUST be provided."
+            "Because this queries a workbench database, a specific workbench namespace MUST be provided."
         ),
         "parameters":  {
             "namespace": {
                 "type":        "string",
-                "description": "REQUIRED. The workspace namespace (e.g., 'cmlwb1'). NEVER omit this.",
+                "description": "REQUIRED. The workbench namespace (e.g., 'cmlwb1'). NEVER omit this.",
             },
             "limit":     {
                 "type":        "integer",
@@ -1238,7 +1238,7 @@ K8S_TOOL_METADATA: dict = {
 
     "get_top_pods": {
         "fn":               get_top_pods,
-        "embed_keywords":   "top pods metrics workbench workspace user cpu memory ram usage usage graph highest lowest live historical data trend performance",
+        "embed_keywords":   "top pods metrics workbench workbench user cpu memory ram usage usage graph highest lowest live historical data trend performance",
         "description": (
             "Show live or historical CPU and memory usage for pods, ranked highest or lowest. "
             "ALWAYS emits both a ranked table AND a time-series graph in the output. "

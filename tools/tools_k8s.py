@@ -1642,7 +1642,7 @@ def _enrich_cml_usernames(namespaces: set) -> dict:
     
     for base_ns in base_namespaces:
         try:
-            # Query the users table in the base workspace namespace
+            # Query the users table in the base workbench namespace
             out = exec_db_query(namespace=base_ns, sql="SELECT namespace, username FROM users", pod_name="db-0")
             if "[ERROR]" in out or "(Query returned no rows.)" in out:
                 continue
@@ -1664,7 +1664,7 @@ def _enrich_cml_usernames(namespaces: set) -> dict:
             
     return mapping
 
-def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "cpu",
+def get_workbench_top_requests(namespace: str, limit: int = 10, sort_by: str = "cpu",
                                duration: str = "30d", search: str = "") -> str:
     import re
     import json
@@ -1673,11 +1673,9 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
     
     table_name = "dashboards"
     
-    # Protect against empty or cluster-wide namespaces
     if not namespace or namespace.lower() in ("all", "default"):
-        return "[ERROR] A specific workspace namespace (e.g., 'cmlwb1') is required to query the workspace database."
+        return "[ERROR] A specific workbench namespace (e.g., 'cmlwb1') is required to query the workbench database."
         
-    # Parse duration into a valid Postgres INTERVAL
     m = re.match(r"^(\d+)(h|d|w|m)$", duration.strip().lower())
     if m:
         val, unit = m.groups()
@@ -1686,15 +1684,11 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
     else:
         sql_interval = "30 days"
         
-    # Determine sort column
     sort_col = "cpu" if "cpu" in sort_by.lower() else "memory"
     
-    # Build search condition
     safe_search = search.replace("'", "''")
     search_cond = f" AND (u.username ILIKE '%{safe_search}%' OR d.name ILIKE '%{safe_search}%' OR d.status ILIKE '%{safe_search}%')" if search else ""
-    search_text = f" matching `{search}`" if search else ""
     
-    # Construct the Postgres query
     sql = (
         f"SELECT '{namespace}-user-' || d.creator_id AS user_namespace, "
         f"u.username, d.name AS workload_name, d.cpu, d.memory, d.status, d.created_at "
@@ -1705,7 +1699,6 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
         f"LIMIT {limit}"
     )
     
-    # Execute the query
     out = exec_db_query(namespace=namespace, sql=sql, database="sense")
     
     # Error handling
@@ -1733,12 +1726,12 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
                 except ValueError:
                     continue
                     
-                # Clean timestamp (e.g., '2026-03-25 07:51:23.080983+00' -> '2026-03-25 07:51:23')
                 clean_ts = ts_str.split(".")[0].split("+")[0].strip()
                 parsed_rows.append((u_ns, uname, wname, cpu_val, mem_val, status, clean_ts))
 
     if not parsed_rows:
-        return f"No records found in `{table_name}`{search_text} over the last {duration}."
+        search_text = f" matching `{search}`" if search else ""
+        return f"No requests found in `{namespace}`{search_text} over the last {duration}."
 
     # 1. Build the clean, terminal-style Markdown Table
     col_ns = max(len("NAMESPACE"), max((len(r[0]) for r in parsed_rows), default=0))
@@ -1748,14 +1741,20 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
     hdr_row = f"{'NAMESPACE':<{col_ns}}  {'USER':<{col_user}}  {'WORKLOAD':<{col_wl}}  {'CPU':>6}  {'MEMORY':>8}  {'STATUS':<10}  {'CREATED AT'}"
     sep = "-" * len(hdr_row)
     
+    if search:
+        matched_ns = parsed_rows[0][0]
+        matched_uname = (parsed_rows[0][1] or search).capitalize()
+        header_msg = f"List of CPU and RAM requests session in `{namespace}` matching user {matched_uname} ({matched_ns}) — last {duration}."
+    else:
+        header_msg = f"List of CPU and RAM requests session in `{namespace}` — last {duration}."
+
     md_lines = [
-        f"Top {len(parsed_rows)} `{table_name}` by {sort_col.upper()} requests in `{namespace}`{search_text} — last {duration}.",
+        header_msg,
         "```",
         hdr_row,
         sep
     ]
     
-    # 2. Extract Data for Graph JSON (Grouped by User)
     series_dict = {}
     for r in parsed_rows:
         u_ns, uname, wname, cpu_val, mem_val, status, clean_ts = r
@@ -1781,21 +1780,24 @@ def get_workspace_top_requests(namespace: str, limit: int = 10, sort_by: str = "
 
     md_lines.append("```")
 
-    # 3. Sort chronologically and compile Graph JSON
     series_out = []
     for label, points in series_dict.items():
         points.sort(key=lambda x: x[0])  # Sort by timestamp
         series_out.append({"label": label, "values": points})
 
     unit = "cores" if sort_col == "cpu" else "GB"
+    
+    graph_title = f"CPU & RAM Requests (by {sort_col.upper()})"
+    if search:
+        graph_title = f"{matched_uname.capitalize()} - {graph_title}"
+
     graph_json = json.dumps({
-        "title": f"Top {len(parsed_rows)} {table_name.title()} — {sort_col.upper()} Requests",
+        "title": graph_title,
         "unit": unit,
         "duration": duration,
         "series": series_out
     }, separators=(",", ":"))
 
-    # Append graph block
     md_lines.append(f"\n§GRAPH§{graph_json}§GRAPH§")
 
     return "\n".join(md_lines)
