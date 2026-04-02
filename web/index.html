@@ -1971,7 +1971,7 @@ function applySecretToggleUI(on){
 async function saveConfig() {
   const outputStatus = document.getElementById('output-status');
   if (outputStatus) {
-    outputStatus.style.color = '#60a5fa';
+    outputStatus.style.color = 'var(--accent2)'; // Theme's secondary accent for loading
     outputStatus.textContent = '⏳ Saving…';
   }
   
@@ -1999,19 +1999,18 @@ async function saveConfig() {
       body: JSON.stringify(payload)
     });
     if(res.ok && outputStatus) {
-      outputStatus.style.color = '#22c55e';
+      outputStatus.style.color = 'var(--accent)'; // Theme's primary accent for success
       outputStatus.textContent = '✓ Saved automatically';
       setTimeout(() => { if(outputStatus.textContent === '✓ Saved automatically') outputStatus.textContent = ''; }, 2500);
     }
   } catch(e) {
     if (outputStatus) {
-      outputStatus.style.color = '#ef4444';
+      outputStatus.style.color = '#ef4444'; // Hardcoded red for errors
       outputStatus.textContent = '✗ Save failed';
     }
   }
 }
 
-// Fetch all settings from backend on load
 // Fetch all settings from backend on load
 async function loadOutputConfig(){
   try {
@@ -2068,7 +2067,7 @@ if (secretToggle) {
   });
 }
 
-// Helper to calculate and apply dynamic GPU-like color to sliders
+// Helper to calculate and apply a gradual darker green color to sliders
 function updateSliderColor(slider) {
   if (!slider) return;
   const min = parseFloat(slider.min) || 0;
@@ -2078,11 +2077,10 @@ function updateSliderColor(slider) {
   // Calculate percentage (0 to 100)
   const p = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
   
-  // Teal -> Violet -> Deep Red logic (matches GPU bar)
-  let color;
-  if (p < 50) color = 'hsl(' + (190 - p * 0.6) + ',85%,45%)';           // Teal
-  else if (p < 80) color = 'hsl(' + (160 - (p - 50) * 4) + ',80%,42%)'; // Violet
-  else color = 'hsl(' + (40 - (p - 80) * 2) + ',85%,42%)';              // Deep Red
+  // Gradual Dark Green logic: 
+  // Keeps the same green hue (142) and saturation (76%), 
+  // but gradually drops the lightness from 45% (vibrant) to 25% (dark)
+  const color = `hsl(142, 76%, ${45 - (p / 100) * 20}%)`;
   
   slider.style.accentColor = color;
   
