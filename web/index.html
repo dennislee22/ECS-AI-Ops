@@ -10,64 +10,6 @@
 <script src="/static/marked.min.js"></script>
 <style>
 
-/* Styling for the active Stop button (applies to both Chat and KB) */
-.stop-mode {
-  background: #ef4444 !important;
-  color: #fff !important;
-  border-color: #dc2626 !important;
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 6px 18px;
-}
-.stop-mode:hover {
-  background: #dc2626 !important;
-}
-.stop-dots {
-  display: flex;
-  gap: 3px;
-}
-.stop-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  animation: dotPulse 1.2s infinite;
-}
-.stop-dot:nth-child(2) { animation-delay: 0.2s; }
-.stop-dot:nth-child(3) { animation-delay: 0.4s; }
-
-.section-tooltip { 
-    display: none; /* Hides it by default */
-    position: fixed; 
-    z-index: 9999; 
-    background: #1a2035; 
-    border: 1px solid var(--accent2); 
-    border-radius: 8px; 
-    padding: 10px 13px; 
-    width: 320px; 
-    box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 0 1px rgba(88,166,255,0.15); 
-    pointer-events: none; 
-    text-transform: none; 
-    font-family: 'IBM Plex Sans', sans-serif; 
-    font-weight: 400; 
-    letter-spacing: 0; 
-}
-.section-tooltip.visible { 
-    display: block; /* Shows it when hovered */
-}
-
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{font-family:'IBM Plex Sans',sans-serif}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-textarea:focus{outline:none}
-button{cursor:pointer;font-family:inherit}
-
 /* ── Theme variables (Midnight defaults) ─────────────────────────────────── */
 :root{
   --bg:#030712;--headerBg:#070d1a;--border:#0f1f35;
@@ -832,6 +774,64 @@ button{cursor:pointer;font-family:inherit}
 .vram-track{height:7px;background:var(--panelBorder)33;border-radius:3px;position:relative;overflow:hidden}
 .vram-fill{position:absolute;top:0;left:0;bottom:0;border-radius:3px;transition:width 1s ease}
 .gpu-meta{display:flex;gap:10px;font-size:11px}
+
+/* Styling for the active Stop button (applies to both Chat and KB) */
+.stop-mode {
+  background: #ef4444 !important;
+  color: #fff !important;
+  border-color: #dc2626 !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 18px;
+}
+.stop-mode:hover {
+  background: #dc2626 !important;
+}
+.stop-dots {
+  display: flex;
+  gap: 3px;
+}
+.stop-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  animation: dotPulse 1.2s infinite;
+}
+.stop-dot:nth-child(2) { animation-delay: 0.2s; }
+.stop-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.section-tooltip { 
+    display: none; /* Hides it by default */
+    position: fixed; 
+    z-index: 9999; 
+    background: #1a2035; 
+    border: 1px solid var(--accent2); 
+    border-radius: 8px; 
+    padding: 10px 13px; 
+    width: 320px; 
+    box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 0 1px rgba(88,166,255,0.15); 
+    pointer-events: none; 
+    text-transform: none; 
+    font-family: 'IBM Plex Sans', sans-serif; 
+    font-weight: 400; 
+    letter-spacing: 0; 
+}
+.section-tooltip.visible { 
+    display: block; /* Shows it when hovered */
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'IBM Plex Sans',sans-serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+textarea:focus{outline:none}
+button{cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
