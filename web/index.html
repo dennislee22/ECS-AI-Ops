@@ -982,8 +982,7 @@ button{cursor:pointer;font-family:inherit}
 
       <!-- ── README pane ───────────────────────────────────────────────── -->
       <div id="readme-pane">
-
-        <h1><img src="/static/chatbot-icon.svg" width="26" height="26" style="vertical-align:middle;margin-right:6px;filter:brightness(0) invert(1)"><img src="/static/k8s-logo.svg" width="24" height="24" style="vertical-align:middle;margin-right:8px">Cloudera ECS AI Ops</h1>
+        <h1><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" style="vertical-align:middle;margin-right:6px"><use href="#icon-chat"/></svg><img src="/static/k8s-logo.svg" width="24" height="24" style="vertical-align:middle;margin-right:8px">Cloudera ECS AI Ops</h1>
         <p>An air-gapped Kubernetes operations assistant for Cloudera ECS, powered by a local LLM, LangGraph agentic loop, and LanceDB RAG. The LLM can be hosted on GPU or CPU with no code changes required. When no GPU is detected at startup, the application automatically falls back to CPU inference.</p>
         <p>&#9888; This chatbot is read-only by default. It will never restart, delete, or modify cluster resources. Validated on Qwen3-8B model.</p>
 
@@ -2384,6 +2383,7 @@ const EXAMPLES = [
   'Show the CPU and RAM usage of all nodes for the past 2hr',
   'Show the disk I/O of all the nodes for the past 3 months',
   'Show the top 3 pods with the highest CPU and RAM usage over the past 2 months',
+  'Where is grafana?',
   'I need a pod with 2CPU & 8GB RAM, does the cluster have enough available capacity?',
   'List all sessions with cpu and mem requested by user Dennis in cmlwb1 workspace for the past 22 days',
   'Show the resources usage for user Dennis in cmlwb1 workbench for the past 10 weeks',
