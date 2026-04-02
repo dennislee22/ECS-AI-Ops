@@ -74,7 +74,7 @@ button{cursor:pointer;font-family:inherit}
   --accent:#38bdf8;--accent2:#7dd3fc;
   --msgBg:#070d1a;--inputBg:#0a0f1e;
   --userBg:#0f172a;--userBorder:#1e293b;
-  --statusBg:#040b14;--dimText:#64748b;--bodyText:#cbd5e1;
+  --statusBg:#040b14;--dimText:#939ba5;--bodyText:#cbd5e1;
   --tooltipBg:#0a1628;--tooltipText:#94a3b8;
   --panelBg:#020a14;--panelBorder:#0f1f35;--panelLabel:#7dd3fc;--panelDim:#475569;
   --textMain:#e2e8f0;--inputText:#e2e8f0;
@@ -1008,7 +1008,9 @@ button{cursor:pointer;font-family:inherit}
           </svg>
         </h3>
         <p>The <strong>Skip Synthesis</strong> toggle bypasses the LLM's final answer generation and streams the raw tool output directly to the chat. Best used for simple single-tool queries where the output is self-explanatory (e.g. logs, pod describe, health scorecard). Responses are typically faster.</p>
-        <p style="color:#f59e0b;font-family:'IBM Plex Mono',monospace;font-size:12px">⚠ Keep OFF for investigative or multi-step questions. When Skip Synthesis is ON, the agent stops after the first tool call and cannot chain multiple tools together.</p>
+        <div style="background:var(--inputBg); border-left:3px solid #f59e0b; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0 16px; font-size:13px; font-family:'IBM Plex Sans',sans-serif;">
+          ⚠️ <strong style="color:#f59e0b">Warning:</strong> Enabling this option will show decoded secret values including passwords, tokens, and certificates directly in the chat. Only enable in a secure, private session.
+        </div>
 
         <!-- Max output tokens -->
         <h3 style="margin-top:14px;">Set Max Output Tokens</h3>
