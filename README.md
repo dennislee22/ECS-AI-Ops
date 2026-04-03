@@ -313,7 +313,7 @@ curl -s -X POST http://localhost:8080/api/tool \
 
 | Inference mode | Model | Min. CPU cores| Min. RAM | Min. VRAM |
 |---|---|---|---|---|
-| GPU **(recommended)** | [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B) | 8 | 32 GB | 25 GB |
+| GPU **(recommended)** | [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B) | 2 | 8 GB | 25 GB |
 | CPU | [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B) | 32 | 128 GB | — |
 | CPU | [Qwen/Qwen3-8B-GGUF](https://huggingface.co/Qwen/Qwen3-8B-GGUF) Q4_K_M | 32 | 128 GB | — |
 
