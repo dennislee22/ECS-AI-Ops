@@ -1003,7 +1003,7 @@ button{cursor:pointer;font-family:inherit}
 
         <!-- ── ECS AI Ops Chatbot ──────────────────────────────────────── -->
         <h2 style="font-size:15px;font-family:'IBM Plex Sans',sans-serif;letter-spacing:normal"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" style="vertical-align:-2px;margin-right:5px"><use href="#icon-chat"/></svg> ECS AI Ops Chatbot</h2>
-        <p>Each query runs through an <strong>agentic ReAct loop</strong> driven by the LLM. The agent selects from a suite of Kubernetes tools covering pod status, node inspection, events, logs, PVC bindings, Longhorn storage, resource metrics, Secrets, deployments, services, ingress, ReplicaSets, and direct database access. It observes the results and decides whether to chain further tool calls or synthesise a final answer. Each query is treated independently with no conversation history.</p>
+        <p>Each query runs through an <strong>agentic ReAct loop</strong> driven by the LLM. The agent selects from a suite of Kubernetes tools covering pod status, node inspection, events, logs, PVC bindings, Longhorn storage, resource metrics, Secrets, deployments, services, ingress, replicaSet, and direct database access. It observes the results and decides whether to chain further tool calls or synthesise a final answer. Each query is treated independently with no conversation history.</p>
         <div class="tip">⚠️ Querying “Which pods are hosted in ecs-m-01.dlee155.cldr.example?” and “List all pods hosted in ecs-m-01.dlee155.cldr.example” yields different interpretations. The latter returns results faster because the chatbot is designed to skip synthesis and directly display the full tool output when it detects “List all,” saving both time and tokens.</div>
 
         <!-- Skip Synthesis -->
@@ -1142,8 +1142,8 @@ button{cursor:pointer;font-family:inherit}
 
         <h2>Resources &amp; Compute</h2>
         <span class="gl-tag gl-tag-resource">RESOURCE</span>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all replicaset in cdp-keda namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all replicaset in cdp-keda namespace')">copy</button></div></div>
-        <div class="gl-ex-note">Lists ReplicaSets in cdp-keda with replica health status.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all replicaSet in cdp-keda namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all replicaset in cdp-keda namespace')">copy</button></div></div>
+        <div class="gl-ex-note">Lists replicaSet in cdp-keda with replica health status.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">what's the cpu and ram request for cdp-embedded-db pod in cdp namespace?</span><button class="gl-copy-btn" onclick="glCopy(this,'what\'s the cpu and ram request for cdp-embedded-db pod in cdp namespace?')">copy</button></div></div>
         <div class="gl-ex-note">Shows CPU and memory requests and limits per container in the pod.</div>
 
@@ -1157,7 +1157,7 @@ button{cursor:pointer;font-family:inherit}
         <h2>Nodes &amp; Taints</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list nodes tainted with "control"</span><button class="gl-copy-btn" onclick="glCopy(this,'list nodes tainted with &quot;control&quot;')">copy</button></div></div>
-        <div class="gl-ex-note">Filters node taints by key/value containing "control" — useful for finding control-plane dedicated nodes.</div>
+        <div class="gl-ex-note">Filters node taints by key/value containing "control".</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which node has a GPU available and in use?</span><button class="gl-copy-btn" onclick="glCopy(this,'which node has a GPU available and in use?')">copy</button></div></div>
         <div class="gl-ex-note">Inspects GPU allocatable capacity from the device plugin and shows which pod is currently consuming it.</div>
 
