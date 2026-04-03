@@ -1156,10 +1156,10 @@ button{cursor:pointer;font-family:inherit}
 
         <h2>Nodes &amp; Taints</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list nodes tainted with "control"</span><button class="gl-copy-btn" onclick="glCopy(this,'list nodes tainted with &quot;control&quot;')">copy</button></div></div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">List nodes tainted with "control"</span><button class="gl-copy-btn" onclick="glCopy(this,'List nodes tainted with &quot;control&quot;')">copy</button></div></div>
         <div class="gl-ex-note">Filters node taints by key/value containing "control".</div>
-        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which node has a GPU available and in use?</span><button class="gl-copy-btn" onclick="glCopy(this,'which node has a GPU available and in use?')">copy</button></div></div>
-        <div class="gl-ex-note">Inspects GPU allocatable capacity from the device plugin and shows which pod is currently consuming it.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">List all nodes with GPU</span><button class="gl-copy-btn" onclick="glCopy(this,'List all nodes with GPU')">copy</button></div></div>
+        <div class="gl-ex-note">Inspects GPU allocatable capacity for each node.</div>
 
         <h2>Networking &amp; Ingress</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
@@ -2347,7 +2347,6 @@ const EXAMPLES = [
   'List all storage types used by pods in cdp ns',
   'Check all namespaces, which pvc is not bound?',
   'Find any resource named with vault in its name',
-  'Which node has a GPU available and in use?',
   'What storage classes are available in the cluster?',
   'List all replicaset in cdp-keda namespace',
   'show all warning events in cdp namespace',
@@ -2359,6 +2358,7 @@ const EXAMPLES = [
   'Show the CPU and RAM usage of all nodes for the past 2hr',
   'Show the disk I/O of all the nodes for the past 3 months',
   'Show the top 3 pods with the highest CPU and RAM usage over the past 2 months',
+  'Which node has GPU?',
   'Where is grafana?',
   'I need a pod with 2CPU & 8GB RAM, does the cluster have enough available capacity?',
   'List all sessions with cpu and mem requested by user Dennis in cmlwb1 workspace for the past 22 days',
