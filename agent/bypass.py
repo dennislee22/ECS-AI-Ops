@@ -59,7 +59,6 @@ UNCONDITIONAL_BYPASS = {
     "run_cluster_health",
     "get_namespace_resource_summary",
     "get_pod_logs",
-    #"describe_pod",
     "describe_pvc",
     "describe_pv",
     "describe_sc",

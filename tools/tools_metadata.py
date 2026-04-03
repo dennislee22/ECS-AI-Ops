@@ -1132,8 +1132,8 @@ K8S_TOOL_METADATA: dict = {
         "embed_keywords":   "database db usage sql query mysql mariadb postgresql select show describe table schema user records namespace data queries who owner username lookup workbench resources metrics consume",
         "description": (
             "🛑 CRITICAL - USAGE VS REQUESTS 🛑\n"
-            "- IF USER ASKS ABOUT 'REQUESTS', 'LIMITS', 'SESSIONS', OR 'DASHBOARDS': DO NOT CALL THIS TOOL! Abort and call `get_cml_session_request` instead!\n"
             "- IF USER ASKS ABOUT ACTIVE 'USAGE' FOR A SPECIFIC USER (e.g. 'resources usage for Dennis', 'RAM usage'): YOU MUST CALL THIS TOOL FIRST to find their namespace.\n"
+            "- IF USER ASKS ABOUT 'REQUESTS', 'LIMITS' OR 'SESSIONS': DO NOT CALL THIS TOOL! Abort and call `get_cml_session_request` instead!\n"
             "  → Call exec_db_query with namespace='cmlwb1' (or whatever the main workbench namespace is). NEVER pass the user's namespace (like 'cmlwb1-user-1') to this tool!\n"
             "  → Execute this exact SQL: SELECT namespace FROM users WHERE LOWER(username)=LOWER('<the_user>')\n"
             "  → WAIT for the database to return the namespace (e.g. 'cmlwb1-user-1'), then call `get_top_pods` using that exact namespace.\n\n"
