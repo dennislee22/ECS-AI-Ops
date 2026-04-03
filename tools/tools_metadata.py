@@ -1211,7 +1211,11 @@ K8S_TOOL_METADATA: dict = {
             "search": {
                 "type": "string",
                 "default": "",
-                "description": "Optional keyword to filter by username. E.g., if the user asks for 'Dennis', pass 'Dennis' here."
+                "description": (
+                    "Optional keyword to filter by username. "
+                    "🛑 FATAL: If the user's prompt contains the word 'USAGE' (e.g., 'CPU usage', 'resources usage'), "
+                    "DO NOT PUT THE USERNAME HERE. ABORT THIS TOOL ENTIRELY. You MUST call `exec_db_query` instead to find their namespace!"
+                )
             },
         },
     },
