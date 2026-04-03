@@ -1044,16 +1044,6 @@ button{cursor:pointer;font-family:inherit}
           </svg>
         </div>
 
-        <!-- ── ECS Knowledge Bot ──────────────────────────────────────── -->
-        <h2 style="font-size:15px;font-family:'IBM Plex Sans',sans-serif;letter-spacing:normal;margin-top:22px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" style="vertical-align:-4px;margin-right:5px"><use href="#icon-kb-bot"/></svg> ECS Knowledge Bot</h2>
-        <p>A knowledge base interface that retrieves relevant context from your ingested documents and synthesises a focused answer using the LLM with no live cluster calls. Best used for looking up incidents, known issues, and dos &amp; don'ts.</p>
-        <table>
-          <tr><th></th><th>ECS AI Ops Chatbot</th><th>ECS Knowledge Bot</th></tr>
-          <tr><td>Live cluster data</td><td>✅ Yes — kubectl, Longhorn, events</td><td>❌ No</td></tr>
-          <tr><td>Knowledge base (RAG)</td><td>✅ Yes — alongside live data</td><td>✅ Yes — primary source</td></tr>
-          <tr><td>LLM synthesis</td><td>✅ Yes — ReAct agent loop</td><td>✅ Yes — KB-focused prompt</td></tr>
-        </table>
-
         <!-- ── Settings ───────────────────────────────────────────────── -->
         <h2 id="readme-settings-heading" style="display:flex;align-items:center;gap:10px">
           <span id="readme-settings-badge" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;padding:3px 10px 3px 8px;border-radius:6px;border:1px solid var(--accent);background:var(--inputBg);color:var(--accent);letter-spacing:.04em;white-space:nowrap">
@@ -1068,21 +1058,20 @@ button{cursor:pointer;font-family:inherit}
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="vertical-align:-2px;color:var(--accent2)"><use href="#icon-k8s"/></svg>
           Kubeconfig
         </h3>
-        <p>Connect the assistant to your Kubernetes cluster. Paste your kubeconfig YAML into the text area and click <strong>Apply</strong>. The active cluster host is displayed in the header once applied. You can switch clusters at any time with no restart required.</p>
-        <div class="tip">⚠️ Only a single cluster connection is active at a time. Applying a new kubeconfig immediately replaces the previous one.</div>
+        <p>Connect the assistant to your Kubernetes cluster. Paste your kubeconfig YAML into the text area and click <strong>Apply</strong>. The active cluster host is displayed in the header once applied. You can switch clusters at any time with no restart required. Only a single cluster connection is active at a time. Applying a new kubeconfig immediately replaces the previous one.</p>
 
         <!-- RAG Documents -->
         <h3 style="display:flex;align-items:center;gap:8px;margin-top:16px">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="vertical-align:-2px;color:var(--accent2)"><use href="#icon-rag-doc"/></svg>
           RAG Documents
         </h3>
-        <p>Upload and manage documents that feed the <strong>LanceDB</strong> vector store used by both chatbots. Supported formats: <code>.md</code>, <code>.pdf</code>, <code>.txt</code>, <code>.xlsx</code>, <code>.xls</code>.</p>
+        <p>Upload and manage documents that feed the <strong>LanceDB</strong> vector store used by both chatbots. Supported formats: <code>.pdf</code>, <code>.txt</code>, <code>.xlsx</code>, <code>.xls</code>.</p>, <code>.md</code>.
         <ol>
           <li>Drop files onto the upload zone or click to browse.</li>
           <li>Click <strong>Ingest</strong>. Duplicate content is skipped automatically (hash-based deduplication).</li>
           <li>Tick <em>Force re-ingest</em> to overwrite a previously ingested file with updated content. All previously ingested files are listed in the <em>Ingested Files</em> panel at the bottom of this tab.</li>
         </ol>
-        <div class="tip">⚠️ To wipe the entire vector store and start fresh, use the <strong>Nuke Vector DB</strong> button. This permanently deletes all ingested chunks and uploaded files from disk. Use per-file delete for surgical removal.</div>
+        <div class="tip">⚠️ To wipe the entire vector store and start fresh, use the <strong>Nuke Vector DB</strong> button. This permanently deletes all ingested chunks and uploaded files from disk.</div>
         <div style="margin:8px 0 4px">
           <span style="display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid #ef4444;border-radius:8px;color:#ef4444;font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;padding:9px 16px;pointer-events:none;opacity:0.85">
             <svg height="14" width="14" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="flex-shrink:0"><path fill="#ef4444" d="M256,0C114.622,0,0,114.612,0,256c0,141.387,114.622,256,256,256c141.388,0,256-114.613,256-256C512,114.612,397.388,0,256,0z M242.674,232.918c4.061-2.347,8.653-3.572,13.316-3.572c9.5,0,18.358,5.102,23.112,13.326c7.327,12.734,2.97,29.05-9.755,36.408c-4.06,2.327-8.672,3.572-13.306,3.572c-9.51,0-18.346-5.101-23.102-13.327C225.572,256.602,229.98,240.275,242.674,232.918z M82.96,251.734c-1.898-2.02-2.826-4.734-2.633-7.458c0,0-0.163-5.837,0.98-13.928c3.173-22.358,10.591-44.02,21.877-63.694c11.388-19.654,26.45-36.867,44.224-50.806c6.429-5.051,11.562-7.806,11.562-7.806c2.275-1.551,5.092-2.062,7.775-1.46c2.683,0.622,4.99,2.316,6.357,4.694l55.041,95.275c2.469,4.306,1.366,9.817-2.592,12.847c0,0,0.123-0.786-2.786,2.133c-2.918,2.878-5.458,6.153-7.55,9.776c-2.113,3.653-3.663,7.51-4.704,11.459c-1.062,3.959-0.469,3.469-0.469,3.469c-0.653,4.949-4.826,8.642-9.817,8.642H90.204C87.449,254.877,84.817,253.754,82.96,251.734z M339.816,406.346c-0.796,2.612-2.674,4.766-5.143,6c0,0-4.959,3.042-12.56,6.102c-20.95,8.439-43.419,12.837-66.103,12.878c-22.684-0.041-45.164-4.439-66.092-12.878c-7.603-3.06-12.562-6.102-12.562-6.102c-2.48-1.234-4.357-3.388-5.142-6c-0.817-2.653-0.48-5.49,0.887-7.856l55.041-95.296c2.449-4.317,7.755-6.102,12.367-4.174c0,0-0.734,0.246,3.244,1.327c3.95,1.071,8.072,1.653,12.256,1.653c4.174,0,8.316-0.582,12.276-1.653c3.938-1.081,3.235-1.327,3.235-1.327c4.622-1.928,9.898-0.142,12.388,4.174l55.01,95.296C340.296,400.856,340.633,403.693,339.816,406.346z M431.714,244.275c0.184,2.724-0.756,5.439-2.643,7.458c-1.867,2.021-4.49,3.143-7.245,3.143h-110.02c-4.99,0-9.173-3.694-9.826-8.642c0,0,0.612,0.49-0.449-3.469c-1.06-3.95-2.632-7.806-4.714-11.459c-2.102-3.612-4.654-6.898-7.53-9.776c-2.939-2.918-2.817-2.133-2.817-2.133c-3.948-3.03-5.051-8.541-2.561-12.847l55.01-95.275c1.367-2.378,3.673-4.072,6.347-4.694c2.704-0.602,5.51-0.091,7.775,1.46c0,0,5.122,2.755,11.571,7.806c17.797,13.939,32.837,31.152,44.204,50.806c11.306,19.674,18.755,41.336,21.888,63.694C431.858,238.438,431.714,244.275,431.714,244.275z"/></svg>
