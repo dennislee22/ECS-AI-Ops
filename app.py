@@ -2036,15 +2036,15 @@ async def api_get_config():
 async def api_set_config(body: dict):
     updated = {}
     if "kubectl_max_chars" in body:
-        val = max(1000, min(int(body["kubectl_max_chars"]), 200000))
+        val = max(5000, min(int(body["kubectl_max_chars"]), 20000))
         _tk._KUBECTL_MAX_OUT = val
         updated["kubectl_max_chars"] = val
     if "max_new_tokens" in body:
-        val = max(256, min(int(body["max_new_tokens"]), 16384))
+        val = max(256, min(int(body["max_new_tokens"]), 8192))
         config.MAX_NEW_TOKENS = val
         updated["max_new_tokens"] = val
-    if "llm_timeout" in body:
-        val = max(30, min(int(body["llm_timeout"]), 1800))
+    if "llm_timeout" in body: #in seconds
+        val = max(60, min(int(body["llm_timeout"]), 900))
         config.LLM_TIMEOUT = val
         updated["llm_timeout"] = val
     if "disable_loop_protection" in body:
