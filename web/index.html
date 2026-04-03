@@ -1167,6 +1167,8 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-note">Checks CoreDNS pod health in kube-system, reads /etc/resolv.conf, and runs a live nslookup against a real cluster hostname to verify DNS resolution end-to-end.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which namespace contains ingress port 443?</span><button class="gl-copy-btn" onclick="glCopy(this,'which namespace contains ingress port 443?')">copy</button></div></div>
         <div class="gl-ex-note">Searches all ingress resources across namespaces for TLS / port-443 exposure.</div>
+        <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">Is my ingress doing ok for the past 3 days?</span><button class="gl-copy-btn" onclick="glCopy(this,'Is my ingress doing ok for the past 3 days?')">copy</button></div></div>
+        <div class="gl-ex-note">Queries Prometheus for ingress traffic metrics, over a specific duration.</div>
 
         <h2>Graphs &amp; Metrics</h2>
         <span class="gl-tag gl-tag-resource">RESOURCE</span>
