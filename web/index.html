@@ -1115,30 +1115,7 @@ button{cursor:pointer;font-family:inherit}
 
         <p>Tips and examples for getting the best responses from the ECS AI Ops Chatbot.</p>
 
-        <h2>HOW THE CHATBOT DECIDES WHAT TO DO</h2>
-        <p>Every question is independent — there is no conversation history. The chatbot determines your intent and takes one of two paths:</p>
-        <table>
-          <tr><th>Path</th><th>Triggered by</th><th>What happens</th></tr>
-          <tr>
-            <td><span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"><use href="#icon-k8s"/></svg><strong>Live cluster</strong></span></td>
-            <td>Any operational query — pods, namespaces, secrets, storage, ingress, resources, database&hellip;</td>
-            <td>Runs a read-only tool against the live ECS cluster and synthesises the result.</td>
-          </tr>
-          <tr>
-            <td><strong>&#129504; Model knowledge</strong></td>
-            <td>Must add <em>&ldquo;don&rsquo;t run it, just explain&rdquo;</em> if you want the model to describe what it would do. e.g. <em>what command do you run to get pods in a namespace? Don&rsquo;t run it, just explain.</em></td>
-            <td>No tool is called. The model uses its trained knowledge to explain the approach. Without this instruction, operational queries will always execute against the live cluster.</td>
-          </tr>
-          <tr>
-            <td><strong>&#128172; Conversational</strong></td>
-            <td>Greetings, identity questions, general chat</td>
-            <td>Responds directly &mdash; no tool is called.</td>
-          </tr>
-        </table>
-
-        <h2>EXAMPLE QUERIES BY CATEGORY</h2>
-
-        <h3>Pods &amp; Health</h3>
+        <h2>Pods &amp; Health</h2>
         <span class="gl-tag gl-tag-pod">POD</span><span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-pod"></div><div class="gl-ex-body"><span class="gl-ex-text">list all pods in cdp namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all pods in cdp namespace')">copy</button></div></div>
         <div class="gl-ex-note">Lists all pods in the cdp namespace with their phase and ready status.</div>
@@ -1149,21 +1126,21 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-pod"></div><div class="gl-ex-body"><span class="gl-ex-text">Which pods have restarted more than 5 times in the last 24 hours and why?</span><button class="gl-copy-btn" onclick="glCopy(this,'Which pods have restarted more than 5 times in the last 24 hours and why?')">copy</button></div></div>
         <div class="gl-ex-note">Identifies pods that have restarted more than 5 times within the past 24 hours.</div>
 
-        <h3>Finding Resources</h3>
+        <h2>Finding Resources</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list any resource named with vault in its name</span><button class="gl-copy-btn" onclick="glCopy(this,'list any resource named with vault in its name')">copy</button></div></div>
         <div class="gl-ex-note">Searches across pods, deployments, services, statefulsets, ingresses, PVCs, configmaps, and secrets cluster-wide for anything named vault.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">Where is grafana?</span><button class="gl-copy-btn" onclick="glCopy(this,'Where is grafana?')">copy</button></div></div>
         <div class="gl-ex-note">Searches across all K8s resource types cluster-wide for anything named grafana; including pods, deployments, services, ingresses, and more.</div>
         
-        <h3>Namespaces</h3>
+        <h2>Namespaces</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which namespace has the least pods?</span><button class="gl-copy-btn" onclick="glCopy(this,'which namespace has the least pods?')">copy</button></div></div>
         <div class="gl-ex-note">Counts pods per namespace and ranks them.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all namespaces with total pods</span><button class="gl-copy-btn" onclick="glCopy(this,'list all namespaces with total pods')">copy</button></div></div>
         <div class="gl-ex-note">Returns every namespace with its pod count.</div>
 
-        <h3>Resources &amp; Compute</h3>
+        <h2>Resources &amp; Compute</h2>
         <span class="gl-tag gl-tag-resource">RESOURCE</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list all replicaset in cdp-keda namespace</span><button class="gl-copy-btn" onclick="glCopy(this,'list all replicaset in cdp-keda namespace')">copy</button></div></div>
         <div class="gl-ex-note">Lists ReplicaSets in cdp-keda with replica health status.</div>
@@ -1177,21 +1154,21 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">How much capacity is available to be requested for each node?</span><button class="gl-copy-btn" onclick="glCopy(this,'How much capacity is available to be requested for each node?')">copy</button></div></div>
         <div class="gl-ex-note">Shows the allocatable CPU and memory remaining on each node in %.</div>
 
-        <h3>Nodes &amp; Taints</h3>
+        <h2>Nodes &amp; Taints</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">list nodes tainted with "control"</span><button class="gl-copy-btn" onclick="glCopy(this,'list nodes tainted with &quot;control&quot;')">copy</button></div></div>
         <div class="gl-ex-note">Filters node taints by key/value containing "control" — useful for finding control-plane dedicated nodes.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which node has a GPU available and in use?</span><button class="gl-copy-btn" onclick="glCopy(this,'which node has a GPU available and in use?')">copy</button></div></div>
         <div class="gl-ex-note">Inspects GPU allocatable capacity from the device plugin and shows which pod is currently consuming it.</div>
 
-        <h3>Networking &amp; Ingress</h3>
+        <h2>Networking &amp; Ingress</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">is CoreDNS doing ok?</span><button class="gl-copy-btn" onclick="glCopy(this,'is CoreDNS doing ok?')">copy</button></div></div>
         <div class="gl-ex-note">Checks CoreDNS pod health in kube-system, reads /etc/resolv.conf, and runs a live nslookup against a real cluster hostname to verify DNS resolution end-to-end.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">which namespace contains ingress port 443?</span><button class="gl-copy-btn" onclick="glCopy(this,'which namespace contains ingress port 443?')">copy</button></div></div>
         <div class="gl-ex-note">Searches all ingress resources across namespaces for TLS / port-443 exposure.</div>
 
-        <h3>Graphs &amp; Metrics</h3>
+        <h2>Graphs &amp; Metrics</h2>
         <span class="gl-tag gl-tag-resource">RESOURCE</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">show me the CPU and RAM for the top 3 pods across the cluster for the past 60 mins</span><button class="gl-copy-btn" onclick="glCopy(this,'show me the CPU and RAM for the top 3 pods across the cluster for the past 60 mins')">copy</button></div></div>
         <div class="gl-ex-note">Returns Prometheus time-series CPU and memory usage for the top 3 highest-consuming pods cluster-wide, rendered as graph charts.</div>
@@ -1200,7 +1177,7 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-resource"></div><div class="gl-ex-body"><span class="gl-ex-text">show me the CPU usage for all nodes for the past 45d</span><button class="gl-copy-btn" onclick="glCopy(this,'show me the CPU usage for all nodes for the past 45d')">copy</button></div></div>
         <div class="gl-ex-note">Queries node-exporter metrics from Prometheus and renders a per-node CPU usage graph over the last 45 days.</div>
 
-        <h3>Storage</h3>
+        <h2>Storage</h2>
         <span class="gl-tag gl-tag-storage">STORAGE</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-storage"></div><div class="gl-ex-body"><span class="gl-ex-text">what storage type are pods in cdp namespace using?</span><button class="gl-copy-btn" onclick="glCopy(this,'what storage type are pods in cdp namespace using?')">copy</button></div></div>
         <div class="gl-ex-note">Lists PVCs bound to pods in the cdp namespace, including storage class and access mode.</div>
@@ -1213,14 +1190,14 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">List all pv that consume more than 80% of the allocated disk capacity</span><button class="gl-copy-btn" onclick="glCopy(this,'List all pv that consume more than 80% of the allocated disk capacity')">copy</button></div></div>
         <div class="gl-ex-note">Queries all Persistent Volumes in the cluster and filters those whose used disk capacity exceeds 80% of their allocated size.</div>
 
-        <h3>Secrets &amp; Certificates</h3>
+        <h2>Secrets &amp; Certificates</h2>
         <span class="gl-tag gl-tag-secret">SECRET</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-secret"></div><div class="gl-ex-body"><span class="gl-ex-text">what SSL certificates does the cdp namespace have?</span><button class="gl-copy-btn" onclick="glCopy(this,'what SSL certificates does the cdp namespace have?')">copy</button></div></div>
         <div class="gl-ex-note">Lists TLS/cert secrets in the cdp namespace. Enable <strong>Show Secret Values</strong> in Settings to decode.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-secret"></div><div class="gl-ex-body"><span class="gl-ex-text">Decode cdp-private-installer-db-root-cert secret in cdp ns</span><button class="gl-copy-btn" onclick="glCopy(this,'Decode cdp-private-installer-db-root-cert secret in cdp ns')">copy</button></div></div>
         <div class="gl-ex-note">Decodes and shows the full certificate value. Requires <strong>Show Secret Values</strong> to be enabled in Settings → Security.</div>
 
-        <h3>Cloudera AI (CAI)</h3>
+        <h2>Cloudera AI (CAI)</h2>
         <span class="gl-tag gl-tag-cluster">CLUSTER</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">Show me the CPU usage for user Dennis in cmlwb1 workbench for the past 28 days</span><button class="gl-copy-btn" onclick="glCopy(this,'Show me the CPU usage for user Dennis in cmlwb1 workbench for the past 28 days')">copy</button></div></div>
         <div class="gl-ex-note">Queries Prometheus for per-pod CPU and memory usage in the CAI user namespace and identifies any pods owned by Dennis that are consuming resources. Note: cmlwb1 is the namespace of the CAI Workbench.</div>
@@ -1229,14 +1206,14 @@ button{cursor:pointer;font-family:inherit}
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-cluster"></div><div class="gl-ex-body"><span class="gl-ex-text">Show the resources requested by Dennis in cmlwb1 workbench for the past 10 weeks</span><button class="gl-copy-btn" onclick="glCopy(this,'Show the resources requested by Dennis in cmlwb1 workbench for the past 10 weeks')">copy</button></div></div>
         <div class="gl-ex-note">Queries the CML Workbench database to find historical CPU and memory resource requests allocated to workloads owned by user over a period of time.</div>  
         
-        <h3>Model Knowledge</h3>
+        <h2>Model Knowledge</h2>
         <span class="gl-tag gl-tag-howto">HOW-TO</span><span class="gl-tag gl-tag-general">GENERAL</span>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-howto"></div><div class="gl-ex-body"><span class="gl-ex-text">explain how you access the database of a pod to get the table names, don't run it, just explain</span><button class="gl-copy-btn" onclick="glCopy(this,&quot;explain how you access the database of a pod to get the table names, don't run it, just explain&quot;)">copy</button></div></div>
         <div class="gl-ex-note">Chatbot explains the exec_db_query flow: pod discovery &rarr; credential detection &rarr; SQL execution. No cluster tool is called.</div>
         <div class="gl-ex-row"><div class="gl-ex-bar gl-bar-general"></div><div class="gl-ex-body"><span class="gl-ex-text">what can you do?</span><button class="gl-copy-btn" onclick="glCopy(this,'what can you do?')">copy</button></div></div>
         <div class="gl-ex-note">Lists available capabilities. No tool is called.</div>
 
-      </div><!-- #guidelines-pane -->
+      </div>
 
       <!-- ── Settings pane ────────────────────────────────────────────────── -->
       <div id="settings-pane">
@@ -1319,7 +1296,7 @@ button{cursor:pointer;font-family:inherit}
                 <span style="color:var(--dimText)">Loading…</span>
               </div>
             </div>
-            </div><!-- end stab-pane-scroll -->
+            </div>
 
             <div class="stab-pane-footer">
               <div id="kb-ingest-warn" style="display:none;font-size:11px;font-family:'IBM Plex Mono',monospace;color:#f59e0b;text-align:right;padding-bottom:6px">⚠ No files selected — drop or browse files above first.</div>
@@ -1393,7 +1370,7 @@ button{cursor:pointer;font-family:inherit}
 
             </div>
             <div id="output-status" class="stab-status"></div>
-            </div><!-- end stab-pane-scroll -->
+            </div>
           </div>
 
           <!-- ── Tab: Security ── -->
@@ -1421,7 +1398,7 @@ button{cursor:pointer;font-family:inherit}
                 🔒 Secret values are hidden (safe mode)
               </div>
             </div>
-            </div><!-- end stab-pane-scroll -->
+            </div>
             <div class="modal-btns" style="margin-top:auto">
               <button class="modal-btn modal-btn-cancel" id="security-cancel">Close</button>
             </div>
@@ -1476,11 +1453,11 @@ button{cursor:pointer;font-family:inherit}
             </div>
           </div>
 
-        </div><!-- .stab-content -->
-      </div><!-- #settings-pane -->
+        </div>
+      </div>
 
-    </div><!-- #chat-col -->
-
+    </div>
+    
     <!-- Right panels -->
     <div id="panels">
 
