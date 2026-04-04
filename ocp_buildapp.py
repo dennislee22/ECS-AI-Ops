@@ -24,7 +24,8 @@ def clone_if_missing(repo_url, target_path):
     print(f"Cloned {repo_url} successfully")
 
 #clone_if_missing("https://huggingface.co/Qwen/Qwen3-8B", QWEN_MODEL)
-clone_if_missing("https://huggingface.co/Qwen/Qwen3-8B-GGUF", QWEN_GGUF_MODEL)
+#clone_if_missing("https://huggingface.co/Qwen/Qwen3-8B-GGUF", QWEN_GGUF_MODEL)
+clone_if_missing("https://huggingface.co/Qwen/Qwen3-4B-GGUF", QWEN_GGUF_MODEL)
 clone_if_missing("https://huggingface.co/nomic-ai/nomic-embed-text-v1.5", EMBED_MODEL)
 
 def list_model_files(model_path: Path):
@@ -46,9 +47,11 @@ cmd = [
     str(APP_DIR / "app.py"),
     "--host", "0.0.0.0",
     "--port", "8080",
-    "--model-dir", str(QWEN_GGUF_MODEL / "Qwen3-8B-Q4_K_M.gguf"),
+    "--model-dir", str(QWEN_GGUF_MODEL / "Qwen3-4B-Q4_K_M.gguf"),
     "--embed-dir", str(EMBED_MODEL),
 ]
+#     "--model-dir", str(QWEN_GGUF_MODEL / "Qwen3-8B-Q4_K_M.gguf"),
+
 with open(LOG_FILE, "w") as f:
     process = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT)
 
