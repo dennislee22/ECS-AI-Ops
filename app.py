@@ -25,6 +25,21 @@ from tools.tools_k8s import reload_kubeconfig, _core as _k8s_core
 from tools.tools_metadata import K8S_TOOL_METADATA
 from agent.bypass import should_bypass_llm, BYPASS_NOTE, UNCONDITIONAL_BYPASS
 
+# ── Semantic Routing Hardware Settings ───────────────────────────────────────
+
+# GGUF (CPU):
+#_ROUTING_TOP_K_GGUF = 5
+_ROUTING_TOP_K_GGUF = 5
+#_ROUTING_THRESHOLD_HF = 0.65
+_ROUTING_THRESHOLD_GGUF = 0.65
+
+# HuggingFace (GPU):
+#_ROUTING_TOP_K_HF = 7
+_ROUTING_TOP_K_HF = 5
+#_ROUTING_THRESHOLD_HF = 0.65
+_ROUTING_THRESHOLD_HF = 0.65
+SKIP_IF_TOOL_CHARS = 2000
+
 logging.getLogger("weasyprint").setLevel(logging.ERROR)
 logging.getLogger("fontTools").setLevel(logging.ERROR)
 
@@ -91,21 +106,6 @@ IGNORE_NS = {
     "node", "nodes", "deployment", "deployments", "status", "health", "check", "get",
     "show", "has", "have", "had", "with", "without", "using", "uses", "does", "do"
 }
-
-# ── Semantic Routing Hardware Settings ───────────────────────────────────────
-
-# GGUF (CPU):
-#_ROUTING_TOP_K_GGUF = 5
-_ROUTING_TOP_K_GGUF = 5
-#_ROUTING_THRESHOLD_HF = 0.65
-_ROUTING_THRESHOLD_GGUF = 0.65
-
-# HuggingFace (GPU):
-#_ROUTING_TOP_K_HF = 7
-_ROUTING_TOP_K_HF = 5
-#_ROUTING_THRESHOLD_HF = 0.65
-_ROUTING_THRESHOLD_HF = 0.65
-SKIP_IF_TOOL_CHARS = 2000
 
 def _sse(payload: dict) -> str:
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
