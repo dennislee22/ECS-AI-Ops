@@ -47,7 +47,7 @@ cmd = [
     "--host", "0.0.0.0",
     "--port", "8080",
 #    "--model-dir", str(QWEN_GGUF_MODEL / "Qwen3-8B-Q4_K_M.gguf"),
-    "--model-dir", str(QWEN_GGUF_MODEL),
+    "--model-dir", str(QWEN_MODEL),
     "--embed-dir", str(EMBED_MODEL),
 ]
 
