@@ -339,7 +339,7 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 
 ## Security Notes
 
-- All typed K8s tools are **read-only** by design.
+- All typed K8s tools are **read-only** by design, making them non-intrusive.
 - Secret values are hidden by default — toggle in ⚙ Settings → Security. Preference persists per browser.
 - Restrict the env file: `chmod 600 env`
 
