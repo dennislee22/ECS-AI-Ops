@@ -334,6 +334,7 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 |---|---|---|
 | GPU (A100 80GB PCIe) | No | [test-API-GPU-A100-80GB-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gpu_test_api.log) |
 | CPU (GGUF)| No | [test-API-GGUF-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/gguf_test_api.log) |
+| CPU| No | [test-API-CPU-output.log](https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/cpu_test_api.log) |
 
 ---
 
