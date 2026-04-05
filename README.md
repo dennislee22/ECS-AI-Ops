@@ -356,6 +356,10 @@ You may examine the time taken to execute each query, using GPU, CPU, and CPU (G
 |---|
 | <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-gguf.gif" width="700" /> |
 
+| Inference using CPU |
+|---|
+| <img src="https://raw.githubusercontent.com/dennislee22/huge-assets/main/ECS-AI-Ops-assets/ecs-ai-ops-cpu.gif" width="700" /> |
+
 ---
 
 ## Contact
