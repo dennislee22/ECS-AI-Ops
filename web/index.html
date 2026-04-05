@@ -424,7 +424,7 @@
   border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0 16px;
   font-size:13px;
 }
-#ex-label{font-size:11px;color:#ffffff;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em}
+#ex-label{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:12px;letter-spacing:.05em}
 #ex-btns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 #kb-ex-btns{margin-bottom:4px}
 .kb-ex-label{font-size:11px;font-family:'IBM Plex Mono',monospace;color:#ffffff;letter-spacing:.1em;text-transform:uppercase;width:100%;margin-bottom:2px}
@@ -1594,7 +1594,6 @@ document.querySelectorAll('.mtab').forEach(btn => {
   });
   sendBtn.addEventListener('click', askKb);
 
-  // Wire up the example queries for the Knowledge Bot
   document.querySelectorAll("#kb-ex-btns .ex-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       input.value = btn.textContent.trim();
